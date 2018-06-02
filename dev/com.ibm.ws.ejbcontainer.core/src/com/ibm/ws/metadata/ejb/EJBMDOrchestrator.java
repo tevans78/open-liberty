@@ -3262,16 +3262,7 @@ public abstract class EJBMDOrchestrator {
             bmd.ivEnterpriseBeanFactory = getEJBManagedObjectFactory(bmd, bmd.enterpriseBeanClass);
         }
         if (bmd.ivEnterpriseBeanFactory == null) {
-//            try {
-//                bmd.ivEnterpriseBeanClassConstructor = bmd.enterpriseBeanClass.getConstructor((Class<?>[]) null);
-//            } catch (NoSuchMethodException e) {
-//                Tr.error(tc, "JIT_NO_DEFAULT_CTOR_CNTR5007E",
-//                         new Object[] { bmd.enterpriseBeanClassName, bmd.enterpriseBeanName });
-//                throw new EJBConfigurationException("CNTR5007E: The " + bmd.enterpriseBeanClassName + " bean class for the " + bmd.enterpriseBeanName +
-//                                                    " bean does not have a public constructor that does not take parameters.");
-//            }
-            //TODO this isn't the right exception since there isn't anything the user can do to fix it
-            throw new EJBConfigurationException("ManagedObjectFactory not found");
+            throw new IllegalStateException("ManagedObjectFactory not found");
         }
         // Removed else clause that calls bmd.ivEnterpriseBeanFactory.getConstructor() because this method
         // is called before cdiMMD.setWebBeansContext(webBeansContext) in LibertySingletonServer. If we call
@@ -3352,10 +3343,7 @@ public abstract class EJBMDOrchestrator {
         if (managedObjectService != null) {
             try {
                 ManagedObjectFactory<T> factory = managedObjectService.createEJBManagedObjectFactory(bmd._moduleMetaData, klass, bmd.j2eeName.getComponent());
-
-//                if (factory.isManaged()) {
                 return factory;
-//                }
             } catch (ManagedObjectException e) {
                 throw new EJBConfigurationException(e);
             }

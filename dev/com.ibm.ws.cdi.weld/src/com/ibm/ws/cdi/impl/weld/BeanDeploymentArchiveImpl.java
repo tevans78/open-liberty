@@ -92,6 +92,7 @@ public class BeanDeploymentArchiveImpl implements WebSphereBeanDeploymentArchive
     private final Set<Class<?>> injectionClasses = new HashSet<Class<?>>();
 
     private final Set<Class<?>> jeeComponentClasses = new HashSet<Class<?>>();
+    private Set<Class<?>> jeeComponentClassesIncludingDescendents = null;
 
     private final Set<String> additionalClasses = new HashSet<String>();
     private final Set<String> additionalBeanDefiningAnnotations = new HashSet<String>();
@@ -578,13 +579,18 @@ public class BeanDeploymentArchiveImpl implements WebSphereBeanDeploymentArchive
     }
 
     @Override
-    public Set<Class<?>> getJEEComponentClasses() {
-        Set<Class<?>> classes = new HashSet<Class<?>>(this.jeeComponentClasses);
+    public synchronized Set<Class<?>> getJEEComponentClasses() {
+        if (jeeComponentClassesIncludingDescendents == null) {
 
-        for (WebSphereBeanDeploymentArchive bda : descendantBDAs) {
-            classes.addAll(bda.getJEEComponentClasses());
+            Set<Class<?>> classes = new HashSet<Class<?>>(this.jeeComponentClasses);
+            for (WebSphereBeanDeploymentArchive bda : descendantBDAs) {
+                classes.addAll(bda.getJEEComponentClasses());
+            }
+
+        jeeComponentClassesIncludingDescendents = classes;
+
         }
-        return classes;
+        return jeeComponentClassesIncludingDescendents;
     }
 
     @Override

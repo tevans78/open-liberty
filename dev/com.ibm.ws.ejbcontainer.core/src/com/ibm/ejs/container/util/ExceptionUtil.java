@@ -230,6 +230,7 @@ public class ExceptionUtil {
                    cause instanceof CPMIException ||
                    cause instanceof CSIException ||
                    cause instanceof InjectionException || // d436080
+                   cause instanceof ManagedObjectException ||
                    (cause instanceof EJBException &&
                     cause instanceof WsNestedException)) {
                 Throwable nextCause = cause.getCause();

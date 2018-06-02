@@ -78,7 +78,6 @@ public class InjectInjectionBinding extends InjectionSimpleBinding<Inject> {
 
         if (targetContext == null) {
             if (!(targetObject instanceof Class<?>)) {
-                System.err.println("targetObject=" + targetObject);
                 // Null target context is only valid when we're doing limited injection on an application main class
                 // where we're injecting into the static fields of the class and there is no instance.
                 throw new CDIException(Tr.formatMessage(tc, "no.injection.target.context.CWOWB1006E", targetObject));

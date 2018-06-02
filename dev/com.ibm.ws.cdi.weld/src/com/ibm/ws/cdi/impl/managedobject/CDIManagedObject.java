@@ -21,6 +21,7 @@ import org.jboss.weld.construction.api.WeldCreationalContext;
 import com.ibm.ejs.util.Util;
 import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
+import com.ibm.websphere.ras.annotation.Sensitive;
 import com.ibm.ws.cdi.CDIException;
 import com.ibm.ws.cdi.internal.interfaces.WebSphereInjectionServices;
 import com.ibm.ws.cdi.internal.interfaces.WebSphereInjectionTargetListener;
@@ -155,6 +156,7 @@ public class CDIManagedObject<T> implements ManagedObject<T>, WebSphereInjection
 
     /** {@inheritDoc} */
     @Override
+    @Sensitive
     public T inject(com.ibm.wsspi.injectionengine.InjectionTarget[] targets, InjectionTargetContext injectionContext) throws ManagedObjectException {
         T instance = getObject();
         synchronized (this) { //we really don't want inject being called twice at the same time
@@ -169,7 +171,7 @@ public class CDIManagedObject<T> implements ManagedObject<T>, WebSphereInjection
                 }
 
                 //use Weld to perform injection
-                instance = cdiInjection(instance);
+                cdiInjection(instance);
 
                 for (com.ibm.wsspi.injectionengine.InjectionTarget it : this.currentInjectionTargets) {
                     if (it.getInjectionBinding().getAnnotationType() != Inject.class) {

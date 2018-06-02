@@ -193,13 +193,10 @@ public class InterceptorMetaData {
             int numberOfInterceptors = ivInterceptorClasses.length;
             for (int i = 0; i < numberOfInterceptors; i++) {
                 if (ivInterceptorFactories == null || ivInterceptorFactories[i] == null) {
-//                    interceptors[i] = ivInterceptorClasses[i].newInstance();
-                    //TODO this probably isn't the right exception
-                    throw ExceptionUtil.EJBException("Injection failure: ManagedObjectFactory not found: " + ivInterceptorClasses[i], new NullPointerException());
-                } // else {
+                    throw ExceptionUtil.EJBException("Injection failure: ManagedObjectFactory not found: " + ivInterceptorClasses[i], new IllegalStateException());
+                } 
                 ManagedObject<?> managedObject = ivInterceptorFactories[i].createManagedObject(invocationContext);
                 interceptors[i] = managedObject.getObject();
-                //}
 
                 // F743-21481
                 // Inject into the class, if needed.
@@ -208,11 +205,6 @@ public class InterceptorMetaData {
                 try {
                     InjectionTarget[] targetsForClass = ivInterceptorInjectionTargets[i];
                     managedObject.inject(targetsForClass, targetContext);
-//                    if (targetsForClass.length > 0) {
-//                        for (InjectionTarget oneTarget : targetsForClass) {
-//                            injectionEngine.inject(interceptors[i], oneTarget, targetContext);
-//                        }
-//                    }
                 } catch (Throwable t) {
                     FFDCFilter.processException(t, CLASS_NAME + "createInterceptorInstances", "229", this);
                     if (isTraceOn && tc.isDebugEnabled()) {
