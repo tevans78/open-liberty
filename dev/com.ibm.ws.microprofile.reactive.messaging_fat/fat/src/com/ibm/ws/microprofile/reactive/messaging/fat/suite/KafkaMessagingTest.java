@@ -39,6 +39,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.testcontainers.containers.KafkaContainer;
 
 import com.ibm.websphere.simplicity.ShrinkHelper;
@@ -47,11 +48,13 @@ import com.ibm.ws.microprofile.reactive.messaging.fat.apps.kafka.BasicMessagingB
 import com.ibm.ws.microprofile.reactive.messaging.fat.suite.ConnectorProperties.Direction;
 
 import componenttest.annotation.Server;
+import componenttest.custom.junit.runner.FATRunner;
 import componenttest.topology.impl.LibertyServer;
 
 /**
  *
  */
+@RunWith(FATRunner.class)
 public class KafkaMessagingTest {
 
     private static final String APP_NAME = "basicKafkaTest";
@@ -59,7 +62,7 @@ public class KafkaMessagingTest {
     @ClassRule
     public static KafkaContainer kafka = new KafkaContainer();
 
-    @Server("kafkaServer")
+    @Server("SimpleRxMessagingServer")
     public static LibertyServer server;
 
     private static KafkaConsumer<String, String> kafkaConsumer;
@@ -88,9 +91,9 @@ public class KafkaMessagingTest {
         WebArchive war = ShrinkWrap.create(WebArchive.class, APP_NAME + ".war")
                         .addPackage(BasicMessagingBean.class.getPackage())
                         .addAsResource(config, "META-INF/microprofile-config.properties")
-                        .addAsLibraries(libsDir.list());
+                        .addAsLibraries(libsDir.listFiles());
 
-        ShrinkHelper.exportAppToServer(server, war, DeployOptions.SERVER_ONLY);
+        ShrinkHelper.exportDropinAppToServer(server, war, DeployOptions.SERVER_ONLY);
         server.startServer();
     }
 
@@ -115,7 +118,7 @@ public class KafkaMessagingTest {
         ProducerRecord<String, String> testRecord2 = new ProducerRecord<String, String>("test-in", "xyz");
         kafkaProducer.send(testRecord2).get(30, TimeUnit.SECONDS);
 
-        ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(30));
+        ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(5));
 
         Collection<String> values = StreamSupport
                         .stream(records.spliterator(), false)

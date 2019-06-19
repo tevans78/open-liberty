@@ -19,7 +19,8 @@ import componenttest.topology.utils.ExternalTestServiceDockerClientStrategy;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-                BasicReactiveMessagingTest.class
+                BasicReactiveMessagingTest.class,
+                KafkaMessagingTest.class
 })
 public class FATSuite {
 
