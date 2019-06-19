@@ -59,6 +59,12 @@ push.ibm.repository:
 
 -plugin.6.RemotePublish: ${push.ibm.repository}
 
+-plugin.7.central: \
+  aQute.bnd.repository.maven.provider.MavenBndRepository; \
+    releaseUrl=https://repo.maven.apache.org/maven2/; \
+    index=${build}/central.maven; \
+    name="Central"
+
 -releaserepo: Release
 -baselinerepo: Release
 -buildrepo: Local
