@@ -5,13 +5,14 @@ repositories {
 
 configurations {
     kafkaClient
+    requiredLibs.extendsFrom kafkaClient
 }
 
 dependencies {
-    requiredLibs 'org.apache.kafka:kafka-clients:2.2.0'
-    requiredLibs 'org.lz4:lz4-java:1.5.0'
-    requiredLibs 'com.github.luben:zstd-jni:1.3.8-1'
-    requiredLibs 'org.xerial.snappy:snappy-java:1.1.7.2'
+    kafkaClient 'org.apache.kafka:kafka-clients:2.2.0'
+    kafkaClient 'org.lz4:lz4-java:1.5.0'
+    kafkaClient 'com.github.luben:zstd-jni:1.3.8-1'
+    kafkaClient 'org.xerial.snappy:snappy-java:1.1.7.2'
     requiredLibs 'org.rnorth.duct-tape:duct-tape:1.0.7'
     requiredLibs 'org.slf4j:slf4j-api:1.7.7'
     requiredLibs 'org.slf4j:slf4j-jdk14:1.7.7'
@@ -24,7 +25,7 @@ dependencies {
 
 task addKafkaClientLibs (type: Copy) {
     into new File(autoFvtDir, 'lib/LibertyFATTestFiles/libs')
-    from configurations.requiredLibs
+    from configurations.kafkaClient
     shouldRunAfter autoFVT
 }
 
