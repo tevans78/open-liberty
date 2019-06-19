@@ -1,4 +1,5 @@
 repositories {
+    // TODO: remove this
     mavenCentral()
 }
 
@@ -8,6 +9,17 @@ configurations {
 
 dependencies {
     requiredLibs 'org.apache.kafka:kafka-clients:2.2.0'
+    requiredLibs 'org.lz4:lz4-java:1.5.0'
+    requiredLibs 'com.github.luben:zstd-jni:1.3.8-1'
+    requiredLibs 'org.xerial.snappy:snappy-java:1.1.7.2'
+    requiredLibs 'org.rnorth.duct-tape:duct-tape:1.0.7'
+    requiredLibs 'org.slf4j:slf4j-api:1.7.7'
+    requiredLibs 'org.slf4j:slf4j-jdk14:1.7.7'
+    requiredLibs 'org.testcontainers:testcontainers:1.11.1'
+    requiredLibs 'org.testcontainers:kafka:1.11.1'
+    requiredLibs 'org.rnorth.visible-assertions:visible-assertions:2.1.2'
+    requiredLibs 'org.rnorth:tcp-unix-socket-proxy:1.0.2'
+    requiredLibs 'net.java.dev.jna:jna:5.2.0'
 }
 
 task addKafkaClientLibs (type: Copy) {
