@@ -152,6 +152,7 @@ public class FeatureManager implements FeatureProvisioner, FrameworkReady, Manag
     private final static String CFG_KEY_ACTIVE_FEATURES = "feature";
 
     public static final String EE_COMPATIBLE_NAME = "eeCompatible";
+    public static final String MP_COMPATIBLE_NAME = "mpCompatible";
     final static String INSTALLED_BUNDLE_CACHE = "platform/feature.bundles.cache";
     final static String FEATURE_DEF_CACHE_FILE = "platform/feature.cache";
     final static String FEATURE_FIX_CACHE_FILE = "feature.fix.cache";
@@ -1724,7 +1725,7 @@ public class FeatureManager implements FeatureProvisioner, FrameworkReady, Manag
                 List<String> candidates = chain.getCandidates();
                 if (conflict1 == null) {
                     conflict1 = candidates.get(0);
-                    boolean isEeCompatibleConflict1 = isEeCompatible(conflict1);
+                    boolean isEeCompatibleConflict1 = isEeCompatible(conflict1) || isMPCompatible(conflict1);
                     if (chain.getChain().isEmpty()) {
                         // this is a configured root
                         configured1 = conflict1;
@@ -1739,7 +1740,7 @@ public class FeatureManager implements FeatureProvisioner, FrameworkReady, Manag
                     }
                 } else if (!!!conflict1.equals(candidates.get(0))) {
                     conflict2 = candidates.get(0);
-                    boolean isEeCompatibleConflict2 = isEeCompatible(conflict2);
+                    boolean isEeCompatibleConflict2 = isEeCompatible(conflict2) || isMPCompatible(conflict2);
                     if (chain.getChain().isEmpty()) {
                         // this is a configured root
                         configured2 = conflict2;
@@ -1758,7 +1759,7 @@ public class FeatureManager implements FeatureProvisioner, FrameworkReady, Manag
 
             // Report only the most important conflict caused by two configured features
             if (!!!configuredAlreadyReported(configured1, configured2, reportedConfigured)) {
-                if (isEeCompatible(conflict1)) {
+                if (isEeCompatible(conflict1) || isMPCompatible(conflict1)) {
                     final boolean ignoreVersion = true;
                     if (getEeCompatiblePlatform(conflict1, ignoreVersion).equals(getEeCompatiblePlatform(conflict2, ignoreVersion))) {
                         // Both conflicting features support "Java EE X" or "Jakarta EE X", exclusively
@@ -1874,7 +1875,7 @@ public class FeatureManager implements FeatureProvisioner, FrameworkReady, Manag
         }
 
         private int rank(String symbolicName) {
-            if (isEeCompatible(symbolicName))
+            if (isEeCompatible(symbolicName) || isMPCompatible(symbolicName))
                 return 1;
             switch (featureRepository.getFeature(symbolicName).getVisibility()) {
                 case PUBLIC:
@@ -1901,8 +1902,17 @@ public class FeatureManager implements FeatureProvisioner, FrameworkReady, Manag
         return symbolicName != null && symbolicName.lastIndexOf(EE_COMPATIBLE_NAME) >= 0;
     }
 
+    private boolean isMPCompatible(String symbolicName) {
+        return symbolicName != null && symbolicName.lastIndexOf(MP_COMPATIBLE_NAME) >= 0;
+    }
+
     private static char getEeCompatibleVersion(String symbolicName) {
         return symbolicName.charAt(symbolicName.lastIndexOf("-") + 1);
+    }
+
+    private static String getMPCompatibleVersion(String symbolicName) {
+        int dash = symbolicName.lastIndexOf("-");
+        return symbolicName.substring(dash + 1, dash + 4);
     }
 
     private static String getEeCompatiblePlatform(String symbolicName, boolean ignoreVersion) {
@@ -1919,11 +1929,18 @@ public class FeatureManager implements FeatureProvisioner, FrameworkReady, Manag
         }
     }
 
+    private static String getMPCompatiblePlatform(String symbolicName) {
+        return "MicroProfile " + getMPCompatibleVersion(symbolicName);
+    }
+
     private String getPreferredEePlatform(String symbolicName) {
         ProvisioningFeatureDefinition fdefinition = featureRepository.getFeature(symbolicName);
         for (FeatureResource fr : fdefinition.getConstituents(SubsystemContentType.FEATURE_TYPE)) {
-            if (isEeCompatible(fr.getSymbolicName())) {
-                return getEeCompatiblePlatform(fr.getSymbolicName(), false); // include ee version
+            String frSymbolicName = fr.getSymbolicName();
+            if (isMPCompatible(frSymbolicName)) {
+                return getMPCompatiblePlatform(frSymbolicName); // include MP version
+            } else if (isEeCompatible(frSymbolicName)) {
+                return getEeCompatiblePlatform(frSymbolicName, false); // include ee version
             }
         }
         return "";
