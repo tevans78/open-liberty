@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 IBM Corporation and others.
+ * Copyright (c) 2015, 2021 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,9 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.fat.tests;
 
-import org.junit.ClassRule;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ArchivePaths;
@@ -23,13 +24,14 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.ResourceAdapterArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
-import com.ibm.ws.fat.util.BuildShrinkWrap;
-import com.ibm.ws.fat.util.LoggingTest;
-import com.ibm.ws.fat.util.ShrinkWrapSharedServer;
-import com.ibm.ws.fat.util.browser.WebBrowser;
+import com.ibm.websphere.simplicity.ShrinkHelper;
 
+import componenttest.annotation.Server;
+import componenttest.custom.junit.runner.FATRunner;
 import componenttest.custom.junit.runner.Mode;
 import componenttest.custom.junit.runner.Mode.TestMode;
+import componenttest.topology.utils.HttpUtils;
+import componenttest.topology.impl.LibertyServer;
 
 /**
  * Test Method parameter injection.
@@ -39,15 +41,15 @@ import componenttest.custom.junit.runner.Mode.TestMode;
  * This test tests method parameter injection on a servlet, an EJB and a CDI bean.
  */
 @Mode(TestMode.FULL)
-public class InjectParameterTest extends LoggingTest {
+@RunWith(FATRunner.class)
+public class InjectParameterTest {
 
-    @ClassRule
-    public static ShrinkWrapSharedServer SHARED_SERVER = new ShrinkWrapSharedServer("cdi12EJB32Server");
+    @Server("cdi12EJB32Server")
+    public static LibertyServer server;
 
-
-    @BuildShrinkWrap
-    public static Archive buildShrinkWrap() {
-        return ShrinkWrap.create(WebArchive.class, "injectParameters.war")
+    @BeforeClass
+    public static void setUp() throws Exception {
+        WebArchive injectParameters = ShrinkWrap.create(WebArchive.class, "injectParameters.war")
                         .addClass("com.ibm.ws.cdi12.fat.injectparameters.TestEjb")
                         .addClass("com.ibm.ws.cdi12.fat.injectparameters.TestEjbServlet")
                         .addClass("com.ibm.ws.cdi12.fat.injectparameters.TestServlet")
@@ -55,27 +57,25 @@ public class InjectParameterTest extends LoggingTest {
                         .addClass("com.ibm.ws.cdi12.fat.injectparameters.TestUtils")
                         .addClass("com.ibm.ws.cdi12.fat.injectparameters.TestCdiBean")
                         .addClass("com.ibm.ws.cdi12.fat.injectparameters.TestCdiBeanServlet");
+
+        ShrinkHelper.exportDropinAppToServer(server, injectParameters);
+        server.startServer();
     }
 
     private static String EXPECTED_RESPONSE = "test1, test2, test3, test4, test5, test6, test7, test8, test9, test10, test11, test12, test13, test14, test15, test16";
 
-    @Override
-    protected ShrinkWrapSharedServer getSharedServer() {
-        return SHARED_SERVER;
-    }
-
     @Test
     public void testServletParameterInjection() throws Exception {
-        verifyResponse("/injectParameters/TestServlet", EXPECTED_RESPONSE);
+        HttpUtils.findStringInUrl(server, "/injectParameters/TestServlet", EXPECTED_RESPONSE);
     }
 
     @Test
     public void testEjbParameterInjection() throws Exception {
-        verifyResponse("/injectParameters/TestEjb", EXPECTED_RESPONSE);
+        HttpUtils.findStringInUrl(server, "/injectParameters/TestEjb", EXPECTED_RESPONSE);
     }
 
     @Test
     public void testCdiBeanParameterInjection() throws Exception {
-        verifyResponse("/injectParameters/TestCdiBean", EXPECTED_RESPONSE);
+        HttpUtils.findStringInUrl(server, "/injectParameters/TestCdiBean", EXPECTED_RESPONSE);
     }
 }

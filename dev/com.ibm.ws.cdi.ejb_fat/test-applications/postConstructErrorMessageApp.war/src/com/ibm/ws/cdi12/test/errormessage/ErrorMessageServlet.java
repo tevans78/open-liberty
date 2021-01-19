@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 IBM Corporation and others.
+ * Copyright (c) 2015, 2021 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.io.PrintWriter;
+
 @WebServlet("/errorMessageTestServlet")
 public class ErrorMessageServlet extends HttpServlet {
 
@@ -28,7 +30,11 @@ public class ErrorMessageServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+System.out.println("GREP");
         errEjb.doSomething();
+        PrintWriter pw = response.getWriter();
+        pw.write("Hello World");
+System.out.println("GREP2");
     }
 
 }

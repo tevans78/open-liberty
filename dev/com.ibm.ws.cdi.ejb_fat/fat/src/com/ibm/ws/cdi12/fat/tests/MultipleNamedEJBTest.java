@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 IBM Corporation and others.
+ * Copyright (c) 2014, 2021 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,10 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.fat.tests;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 
@@ -27,23 +27,33 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.ResourceAdapterArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
-import com.ibm.ws.fat.util.BuildShrinkWrap;
-import com.ibm.ws.fat.util.LoggingTest;
-import com.ibm.ws.fat.util.ShrinkWrapSharedServer;
+import com.ibm.websphere.simplicity.ShrinkHelper;
+
+import componenttest.annotation.Server;
+import componenttest.annotation.TestServlet;
+import componenttest.annotation.TestServlets;
+import componenttest.custom.junit.runner.FATRunner;
+import componenttest.topology.impl.LibertyServer;
 
 import componenttest.topology.utils.FATServletClient;
 
 /**
  * Tests for having one EJB implementation class with two different {@code ejb-name}s declared in {@code ejb-jar.xml}.
  */
-public class MultipleNamedEJBTest extends LoggingTest {
+@RunWith(FATRunner.class)
+public class MultipleNamedEJBTest extends FATServletClient {
 
-    @ClassRule
-    public static ShrinkWrapSharedServer SHARED_SERVER = new ShrinkWrapSharedServer("cdi12EJB32Server", MultipleNamedEJBTest.class);
+    private static final String APP_NAME = "multipleEJBsSingleClass";
 
-    @BuildShrinkWrap
-    public static Archive buildShrinkWrap() {
-        return ShrinkWrap.create(WebArchive.class, "multipleEJBsSingleClass.war")
+    @Server("cdi12EJB32Server")
+    @TestServlets({
+                    @TestServlet(servlet = com.ibm.ws.cdi12.test.multipleNamedEJBs.TestServlet.class, contextRoot = APP_NAME) 
+    })
+    public static LibertyServer server;
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        WebArchive multipleEJBsSingleClass = ShrinkWrap.create(WebArchive.class, APP_NAME+".war")
                         .addClass("com.ibm.ws.cdi12.test.multipleNamedEJBs.SimpleEJBImpl")
                         .addClass("com.ibm.ws.cdi12.test.multipleNamedEJBs.SimpleEJBLocalInterface2")
                         .addClass("com.ibm.ws.cdi12.test.multipleNamedEJBs.TestServlet")
@@ -51,50 +61,9 @@ public class MultipleNamedEJBTest extends LoggingTest {
                         .addClass("com.ibm.ws.cdi12.test.multipleNamedEJBs.SimpleEJBLocalInterface1")
                         .add(new FileAsset(new File("test-applications/multipleEJBsSingleClass.war/resources/WEB-INF/ejb-jar.xml")), "/WEB-INF/ejb-jar.xml")
                         .add(new FileAsset(new File("test-applications/multipleEJBsSingleClass.war/resources/WEB-INF/beans.xml")), "/WEB-INF/beans.xml");
-    }
 
-    @Override
-    protected ShrinkWrapSharedServer getSharedServer() {
-        return SHARED_SERVER;
-    }
-
-    @Rule
-    public final TestName testName = new TestName();
-
-    private final void runTest() throws Exception {
-        FATServletClient.runTest(SHARED_SERVER.getLibertyServer(), "multipleEJBsSingleClass", testName);
-    }
-
-    /**
-     * Test that the two injected EJBs with different names are actually different instances.
-     */
-    @Test
-    public void testEjbsAreDifferentInstances() throws Exception {
-        this.runTest();
-    }
-
-    /**
-     * Test that EJB wrapper class names include the correct EJB bean names.
-     */
-    @Test
-    public void testWrapperClassNamesIncludeBeanName() throws Exception {
-        this.runTest();
-    }
-
-    /**
-     * Test that the 'enterprise bean name' used internally matches the name declared at the injection point.
-     */
-    @Test
-    public void testInternalEnterpriseBeanNames() throws Exception {
-        this.runTest();
-    }
-
-    /**
-     * Test that the two EJBs are actually using different instances of the implementation by storing different state in each of them.
-     */
-    @Test
-    public void testStateIsStoredSeparately() throws Exception {
-        this.runTest();
+        ShrinkHelper.exportDropinAppToServer(server, multipleEJBsSingleClass);
+        server.startServer();
     }
 
 }

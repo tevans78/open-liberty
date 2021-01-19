@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2018 IBM Corporation and others.
+ * Copyright (c) 2015, 2021 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,9 +15,11 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
+import java.util.stream.Collectors;
 
-import org.junit.ClassRule;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ArchivePaths;
@@ -29,21 +31,25 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.ResourceAdapterArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
-import com.ibm.ws.fat.util.BuildShrinkWrap;
-import com.ibm.ws.fat.util.LoggingTest;
-import com.ibm.ws.fat.util.ShrinkWrapSharedServer;
+import com.ibm.websphere.simplicity.ShrinkHelper;
+
+import componenttest.annotation.Server;
+import componenttest.custom.junit.runner.FATRunner;
+import componenttest.topology.utils.HttpUtils;
+import componenttest.topology.impl.LibertyServer;
 
 /**
  * Test to ensure that we correctly discover and fire events for types and beans which are EJBs
  */
-public class EjbDiscoveryTest extends LoggingTest {
+@RunWith(FATRunner.class)
+public class EjbDiscoveryTest {
 
-    @ClassRule
-    public static ShrinkWrapSharedServer SHARED_SERVER = new ShrinkWrapSharedServer("cdi12EjbDiscoveryServer");
+    @Server("cdi12EjbDiscoveryServer")
+    public static LibertyServer server;
 
-    @BuildShrinkWrap
-    public static Archive buildShrinkWrap() {
-        return ShrinkWrap.create(WebArchive.class, "ejbDiscovery.war")
+    @BeforeClass
+    public static void setUp() throws Exception {
+        WebArchive ejbDiscovery = ShrinkWrap.create(WebArchive.class, "ejbDiscovery.war")
                         .addClass("com.ibm.ws.cdi12.ejbdiscovery.extension.DiscoveryExtension")
                         .addClass("com.ibm.ws.cdi12.ejbdiscovery.servlet.DiscoveryServlet")
                         .addClass("com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonDdBean")
@@ -57,15 +63,13 @@ public class EjbDiscoveryTest extends LoggingTest {
                         .add(new FileAsset(new File("test-applications/ejbDiscovery.war/resources/WEB-INF/ejb-jar.xml")), "/WEB-INF/ejb-jar.xml")
                         .add(new FileAsset(new File("test-applications/ejbDiscovery.war/resources/WEB-INF/beans.xml")), "/WEB-INF/beans.xml")
                         .add(new FileAsset(new File("test-applications/ejbDiscovery.war/resources/META-INF/services/javax.enterprise.inject.spi.Extension")), "/META-INF/services/javax.enterprise.inject.spi.Extension");
-    }
 
-    @Override
-    protected ShrinkWrapSharedServer getSharedServer() {
-        return SHARED_SERVER;
+        ShrinkHelper.exportDropinAppToServer(server, ejbDiscovery);
+        server.startServer();
     }
 
     private String getObservations() throws Exception {
-        return SHARED_SERVER.getResponse(createWebBrowserForTestCase(), "/ejbDiscovery").getResponseBody();
+        return HttpUtils.getResponseBody(HttpUtils.getHttpConnection(server, "/ejbDiscovery")).lines().collect(Collectors.joining());
     }
 
     @Test

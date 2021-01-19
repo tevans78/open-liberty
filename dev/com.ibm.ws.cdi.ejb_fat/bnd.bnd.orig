@@ -41,6 +41,10 @@ tested.features:\
         jpa-2.2,\
         beanValidation-2.0,\
         jaxrs-2.1,\
+<<<<<<< HEAD
+        jsf-2.3, \
+        localconnector-1.0
+=======
         jsf-2.3,\
         localconnector-1.0,\
         enterprisebeans-4.0,\
@@ -50,6 +54,7 @@ tested.features:\
         enterprisebeanslite-4.0,\
         enterprisebeanspersistenttimer-4.0,\
         faces-3.0
+>>>>>>> 3dc1a9c... enable EE9 on cdi.ejb fat bucket
 	
 test.project: true
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2018 IBM Corporation and others.
+ * Copyright (c) 2015, 2021 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,9 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.fat.tests;
 
-import org.junit.ClassRule;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 
@@ -25,19 +26,22 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.ResourceAdapterArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
-import com.ibm.ws.fat.util.BuildShrinkWrap;
-import com.ibm.ws.fat.util.LoggingTest;
-import com.ibm.ws.fat.util.ShrinkWrapSharedServer;
+import com.ibm.websphere.simplicity.ShrinkHelper;
 
-public class EjbConstructorInjectionTest extends LoggingTest {
+import componenttest.annotation.Server;
+import componenttest.custom.junit.runner.FATRunner;
+import componenttest.topology.impl.LibertyServer;
+import componenttest.topology.utils.HttpUtils;
 
-    @ClassRule
-    // Create the server and install the CDIOWB Test feature.
-    public static ShrinkWrapSharedServer SHARED_SERVER = new ShrinkWrapSharedServer("cdi12EjbConstructorInjectionServer", EjbConstructorInjectionTest.class);
+@RunWith(FATRunner.class)
+public class EjbConstructorInjectionTest {
 
-    @BuildShrinkWrap
-    public static Archive buildShrinkWrap() {
-        return ShrinkWrap.create(WebArchive.class, "ejbConstructorInjection.war")
+    @Server("cdi12EjbConstructorInjectionServer")
+    public static LibertyServer server;
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        WebArchive ejbConstructorInjection = ShrinkWrap.create(WebArchive.class, "ejbConstructorInjection.war")
                         .addClass("com.ibm.ws.cdi.ejb.constructor.test.Servlet")
                         .addClass("com.ibm.ws.cdi.ejb.constructor.test.BeanTwo")
                         .addClass("com.ibm.ws.cdi.ejb.constructor.test.BeanThree")
@@ -52,16 +56,14 @@ public class EjbConstructorInjectionTest extends LoggingTest {
                         .addClass("com.ibm.ws.cdi.ejb.constructor.test.StaticState")
                         .add(new FileAsset(new File("test-applications/ejbConstructorInjection.war/resources/META-INF/permissions.xml")), "/META-INF/permissions.xml")
                         .add(new FileAsset(new File("test-applications/ejbConstructorInjection.war/resources/WEB-INF/web.xml")), "/WEB-INF/web.xml");
-    }
 
-    @Override
-    protected ShrinkWrapSharedServer getSharedServer() {
-        return SHARED_SERVER;
+        ShrinkHelper.exportDropinAppToServer(server, ejbConstructorInjection);
+        server.startServer();
     }
 
     @Test
     public void testTransientReferenceOnEjbConstructor() throws Exception {
-        this.verifyResponse("/ejbConstructorInjection/Servlet", new String[] { "destroy called",
+        HttpUtils.findStringInUrl(server, "/ejbConstructorInjection/Servlet", new String[] { "destroy called",
                                                                                "First bean message: foo",
                                                                                "Second bean message: bar",
                                                                                "Third bean message: spam",

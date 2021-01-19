@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 IBM Corporation and others.
+ * Copyright (c) 2015, 2021 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,11 +37,10 @@ import com.ibm.ws.fat.util.browser.WebBrowser;
 
 import com.ibm.websphere.simplicity.ShrinkHelper;
 
+import componenttest.annotation.Server;
 import componenttest.custom.junit.runner.FATRunner;
 import componenttest.custom.junit.runner.Mode;
-import componenttest.rules.ServerRules;
 import componenttest.topology.impl.LibertyServer;
-import componenttest.topology.impl.LibertyServerFactory;
 import componenttest.topology.utils.HttpUtils;
 
 
@@ -50,63 +49,41 @@ import componenttest.topology.utils.HttpUtils;
  */
 @Mode(FULL)
 @RunWith(FATRunner.class)
-public class EjbMiscTest extends LoggingTest {
+public class EjbMiscTest {
 
-
-    private static boolean hasSetUp = false;
-    protected static final LibertyServer server = LibertyServerFactory.getLibertyServer("cdi12EJB32MiscServer");
-
-    @Override
-    protected ShrinkWrapSharedServer getSharedServer() {
-        return null;
-    }
-
-    @ClassRule
-    public static final TestRule startAndStopServerRule = ServerRules.startAndStopAutomatically(server);
+    @Server("cdi12EjbConstructorInjectionServer")
+    public static LibertyServer server;
 
     @BeforeClass
     public static void setUp() throws Exception  {
        
-       if (! hasSetUp) {
-            hasSetUp = true;
-            JavaArchive multipleWarEmbeddedJar = ShrinkWrap.create(JavaArchive.class,"multipleWarEmbeddedJar.jar")
-                        .addClass("com.ibm.ws.cdi.lib.MyEjb");
+        JavaArchive multipleWarEmbeddedJar = ShrinkWrap.create(JavaArchive.class,"multipleWarEmbeddedJar.jar")
+                    .addClass("com.ibm.ws.cdi.lib.MyEjb");
 
-            WebArchive multipleWarOne = ShrinkWrap.create(WebArchive.class, "multipleWar1.war")
-                        .addClass("test.multipleWar1.TestServlet")
-                        .addClass("test.multipleWar1.MyBean")
-                        .add(new FileAsset(new File("test-applications/multipleWar1.war/resources/WEB-INF/ejb-jar.xml")), "/WEB-INF/ejb-jar.xml")
-                        .add(new FileAsset(new File("test-applications/multipleWar1.war/resources/WEB-INF/beans.xml")), "/WEB-INF/beans.xml")
-                        .addAsLibrary(multipleWarEmbeddedJar);
+        WebArchive multipleWarOne = ShrinkWrap.create(WebArchive.class, "multipleWar1.war")
+                    .addClass("test.multipleWar1.TestServlet")
+                    .addClass("test.multipleWar1.MyBean")
+                    .add(new FileAsset(new File("test-applications/multipleWar1.war/resources/WEB-INF/ejb-jar.xml")), "/WEB-INF/ejb-jar.xml")
+                    .add(new FileAsset(new File("test-applications/multipleWar1.war/resources/WEB-INF/beans.xml")), "/WEB-INF/beans.xml")
+                    .addAsLibrary(multipleWarEmbeddedJar);
 
-            WebArchive multipleWarTwo = ShrinkWrap.create(WebArchive.class, "multipleWar2.war")
-                        .addClass("test.multipleWar2.TestServlet")
-                        .addClass("test.multipleWar2.MyBean")
-                        .add(new FileAsset(new File("test-applications/multipleWar2.war/resources/WEB-INF/ejb-jar.xml")), "/WEB-INF/ejb-jar.xml")
-                        .add(new FileAsset(new File("test-applications/multipleWar2.war/resources/WEB-INF/beans.xml")), "/WEB-INF/beans.xml")
-                        .addAsLibrary(multipleWarEmbeddedJar);
+        WebArchive multipleWarTwo = ShrinkWrap.create(WebArchive.class, "multipleWar2.war")
+                    .addClass("test.multipleWar2.TestServlet")
+                    .addClass("test.multipleWar2.MyBean")
+                    .add(new FileAsset(new File("test-applications/multipleWar2.war/resources/WEB-INF/ejb-jar.xml")), "/WEB-INF/ejb-jar.xml")
+                    .add(new FileAsset(new File("test-applications/multipleWar2.war/resources/WEB-INF/beans.xml")), "/WEB-INF/beans.xml")
+                    .addAsLibrary(multipleWarEmbeddedJar);
 
-            WebArchive ejbScope = ShrinkWrap.create(WebArchive.class, "ejbScope.war")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.scope.PostConstructingStartupBean")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.scope.PostConstructScopeServlet")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.scope.RequestScopedBean");
+        WebArchive ejbScope = ShrinkWrap.create(WebArchive.class, "ejbScope.war")
+                    .addClass("com.ibm.ws.cdi12.test.ejb.scope.PostConstructingStartupBean")
+                    .addClass("com.ibm.ws.cdi12.test.ejb.scope.PostConstructScopeServlet")
+                    .addClass("com.ibm.ws.cdi12.test.ejb.scope.RequestScopedBean");
 
-            server.setMarkToEndOfLog(server.getDefaultLogFile());
-            ShrinkHelper.exportDropinAppToServer(server, multipleWarOne);
-            ShrinkHelper.exportDropinAppToServer(server, multipleWarTwo);
-            ShrinkHelper.exportDropinAppToServer(server, ejbScope);
+        ShrinkHelper.exportDropinAppToServer(server, multipleWarOne);
+        ShrinkHelper.exportDropinAppToServer(server, multipleWarTwo);
+        ShrinkHelper.exportDropinAppToServer(server, ejbScope);
 
-            assertNotNull("multipleWarOne started or updated message", server.waitForStringInLogUsingMark("CWWKZ000[13]I.*multipleWar1"));
-            assertNotNull("multipleWarTwo started or updated message", server.waitForStringInLogUsingMark("CWWKZ000[13]I.*multipleWar2"));
-            assertNotNull("ejbScope started or updated message", server.waitForStringInLogUsingMark("CWWKZ000[13]I.*ejbScope"));
-            server.setMarkToEndOfLog(server.getDefaultLogFile());
-        } else { 
-            assertNotNull("multipleWarOne started or updated message", server.waitForStringInLogUsingMark("CWWKZ000[13]I.*multipleWar1"));
-            assertNotNull("multipleWarTwo started or updated message", server.waitForStringInLogUsingMark("CWWKZ000[13]I.*multipleWar2"));
-            assertNotNull("ejbScope started or updated message", server.waitForStringInLogUsingMark("CWWKZ000[13]I.*ejbScope"));
-         
-        }
-       
+        server.startServer();
     }
 
     /**
