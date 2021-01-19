@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017, 2021 IBM Corporation and others.
+ * Copyright (c) 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,11 +8,21 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-apply from: '../wlp-gradle/subprojects/fat.gradle'
 
-addRequiredLibraries.dependsOn addJakartaTransformer
+package com.ibm.ws.cdi.beansxml.implicit.apps.ejb;
 
-dependencies {
-  requiredLibs 'commons-logging:commons-logging:1.1.3', 'commons-codec:commons-codec:1.6', 'net.sf.jtidy:jtidy:9.3.8'
+import javax.annotation.ManagedBean;
+
+@ManagedBean
+public class ManagedSimpleBean {
+    private String value;
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return this.value;
+    }
+
 }
-

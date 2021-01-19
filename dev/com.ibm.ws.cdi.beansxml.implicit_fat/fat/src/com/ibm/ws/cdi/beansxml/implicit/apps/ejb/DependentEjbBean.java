@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017, 2021 IBM Corporation and others.
+ * Copyright (c) 2015, 2021 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,11 +8,24 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-apply from: '../wlp-gradle/subprojects/fat.gradle'
+package com.ibm.ws.cdi.beansxml.implicit.apps.ejb;
 
-addRequiredLibraries.dependsOn addJakartaTransformer
+import javax.enterprise.context.Dependent;
 
-dependencies {
-  requiredLibs 'commons-logging:commons-logging:1.1.3', 'commons-codec:commons-codec:1.6', 'net.sf.jtidy:jtidy:9.3.8'
+/**
+ *
+ */
+@Dependent
+public class DependentEjbBean {
+
+    private String message;
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return this.message;
+    }
+
 }
-

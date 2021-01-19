@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017, 2021 IBM Corporation and others.
+ * Copyright (c) 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,11 +8,20 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-apply from: '../wlp-gradle/subprojects/fat.gradle'
+package com.ibm.ws.cdi.beansxml.implicit.utils;
 
-addRequiredLibraries.dependsOn addJakartaTransformer
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-dependencies {
-  requiredLibs 'commons-logging:commons-logging:1.1.3', 'commons-codec:commons-codec:1.6', 'net.sf.jtidy:jtidy:9.3.8'
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import javax.interceptor.InterceptorBinding;
+
+@InterceptorBinding
+@Target({ METHOD, TYPE })
+@Retention(RUNTIME)
+public @interface Intercepted {
+
 }
-
