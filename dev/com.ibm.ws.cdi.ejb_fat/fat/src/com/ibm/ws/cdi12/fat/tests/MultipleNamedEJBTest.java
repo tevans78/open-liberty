@@ -10,31 +10,29 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.fat.tests;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.rules.TestName;
-import org.junit.runner.RunWith;
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE7_FULL;
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE9;
 
 import java.io.File;
 
-import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.FileAsset;
-import org.jboss.shrinkwrap.api.importer.ZipImporter;
-import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.api.spec.ResourceAdapterArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.runner.RunWith;
 
 import com.ibm.websphere.simplicity.ShrinkHelper;
+import com.ibm.websphere.simplicity.ShrinkHelper.DeployOptions;
 
 import componenttest.annotation.Server;
 import componenttest.annotation.TestServlet;
 import componenttest.annotation.TestServlets;
 import componenttest.custom.junit.runner.FATRunner;
+import componenttest.rules.repeater.EERepeatTests;
+import componenttest.rules.repeater.RepeatTests;
 import componenttest.topology.impl.LibertyServer;
-
 import componenttest.topology.utils.FATServletClient;
 
 /**
@@ -43,27 +41,41 @@ import componenttest.topology.utils.FATServletClient;
 @RunWith(FATRunner.class)
 public class MultipleNamedEJBTest extends FATServletClient {
 
-    private static final String APP_NAME = "multipleEJBsSingleClass";
+    public static final String SERVER_NAME = "cdi12EJB32Server";
+    public static final String APP_NAME = "multipleEJBsSingleClass";
 
-    @Server("cdi12EJB32Server")
+    //not bothering to repeat with EE8 ... the EE9 version is mostly a transformed version of the EE8 code
+    @ClassRule
+    public static RepeatTests r = EERepeatTests.with(SERVER_NAME, EE9, EE7_FULL);
+
+    @Server(SERVER_NAME)
     @TestServlets({
-                    @TestServlet(servlet = com.ibm.ws.cdi12.test.multipleNamedEJBs.TestServlet.class, contextRoot = APP_NAME) 
+                    @TestServlet(servlet = com.ibm.ws.cdi12.test.multipleNamedEJBs.TestServlet.class, contextRoot = APP_NAME)
     })
     public static LibertyServer server;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        WebArchive multipleEJBsSingleClass = ShrinkWrap.create(WebArchive.class, APP_NAME+".war")
-                        .addClass("com.ibm.ws.cdi12.test.multipleNamedEJBs.SimpleEJBImpl")
-                        .addClass("com.ibm.ws.cdi12.test.multipleNamedEJBs.SimpleEJBLocalInterface2")
-                        .addClass("com.ibm.ws.cdi12.test.multipleNamedEJBs.TestServlet")
-                        .addClass("com.ibm.ws.cdi12.test.multipleNamedEJBs.SimpleManagedBean")
-                        .addClass("com.ibm.ws.cdi12.test.multipleNamedEJBs.SimpleEJBLocalInterface1")
-                        .add(new FileAsset(new File("test-applications/multipleEJBsSingleClass.war/resources/WEB-INF/ejb-jar.xml")), "/WEB-INF/ejb-jar.xml")
-                        .add(new FileAsset(new File("test-applications/multipleEJBsSingleClass.war/resources/WEB-INF/beans.xml")), "/WEB-INF/beans.xml");
+        WebArchive multipleEJBsSingleClass = ShrinkWrap.create(WebArchive.class, APP_NAME + ".war")
+                                                       .addClass(com.ibm.ws.cdi12.test.multipleNamedEJBs.SimpleEJBImpl.class)
+                                                       .addClass(com.ibm.ws.cdi12.test.multipleNamedEJBs.SimpleEJBLocalInterface2.class)
+                                                       .addClass(com.ibm.ws.cdi12.test.multipleNamedEJBs.TestServlet.class)
+                                                       .addClass(com.ibm.ws.cdi12.test.multipleNamedEJBs.SimpleManagedBean.class)
+                                                       .addClass(com.ibm.ws.cdi12.test.multipleNamedEJBs.SimpleEJBLocalInterface1.class)
+                                                       .add(new FileAsset(new File("test-applications/multipleEJBsSingleClass.war/resources/WEB-INF/ejb-jar.xml")),
+                                                            "/WEB-INF/ejb-jar.xml")
+                                                       .add(new FileAsset(new File("test-applications/multipleEJBsSingleClass.war/resources/WEB-INF/beans.xml")),
+                                                            "/WEB-INF/beans.xml");
 
-        ShrinkHelper.exportDropinAppToServer(server, multipleEJBsSingleClass);
+        ShrinkHelper.exportDropinAppToServer(server, multipleEJBsSingleClass, DeployOptions.SERVER_ONLY);
         server.startServer();
+    }
+
+    @AfterClass
+    public static void shutdown() throws Exception {
+        if (server != null) {
+            server.stopServer();
+        }
     }
 
 }

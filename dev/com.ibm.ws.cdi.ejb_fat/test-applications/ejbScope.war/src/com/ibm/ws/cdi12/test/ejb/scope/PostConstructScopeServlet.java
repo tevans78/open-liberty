@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 IBM Corporation and others.
+ * Copyright (c) 2015, 2021 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,29 +10,29 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.test.ejb.scope;
 
-import java.io.IOException;
+import static org.junit.Assert.assertTrue;
 
 import javax.ejb.EJB;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import org.junit.Test;
+
+import componenttest.app.FATServlet;
 
 @SuppressWarnings("serial")
 @WebServlet("/PostConstructScope")
-public class PostConstructScopeServlet extends HttpServlet {
+public class PostConstructScopeServlet extends FATServlet {
 
     @EJB
     private PostConstructingStartupBean ejb;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+    /**
+     * Test that the request scope is active during postConstruct for an eager singleton bean.
+     *
+     * @throws Exception
      */
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.getOutputStream().println("RequestScope active during postConstruct: " + ejb.getWasRequestScopeActive());
+    @Test
+    public void testPostConstructRequestScope() throws Exception {
+        assertTrue("RequestScope not active during EJB postConstruct", ejb.getWasRequestScopeActive());
     }
 }

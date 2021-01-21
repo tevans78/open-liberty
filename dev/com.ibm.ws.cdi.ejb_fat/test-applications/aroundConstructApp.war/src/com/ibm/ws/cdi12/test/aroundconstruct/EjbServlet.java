@@ -16,6 +16,8 @@ import static org.junit.Assert.assertEquals;
 import javax.inject.Inject;
 import javax.servlet.annotation.WebServlet;
 
+import org.junit.Test;
+
 /**
  * These tests use {@link AroundConstructLogger} to record what happens while intercepting constructors.
  * <p>{@link AroundConstructLogger} is <code>@RequestScoped</code> so a new instance is created for every test.
@@ -43,14 +45,11 @@ public class EjbServlet extends AroundConstructTestServlet {
     /**
      * Test that CDI interceptors work on stateless beans
      */
+    @Test
     public void testStatelessAroundConstruct() {
         assertEquals("Stateless bean should be intercepted.",
                      logger.getInterceptedBean(),
                      id(StatelessEjb.class));
     }
 
-    /**
-     * Test that the correct error message is thrown when an exception is thrown from post construct lifecycle callback in interceptor
-     */
-    public void testPostConstructErrorMessage() {}
 }

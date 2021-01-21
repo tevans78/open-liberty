@@ -10,64 +10,75 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.fat.tests;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE7_FULL;
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE9;
 
 import java.io.File;
 
-import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.FileAsset;
-import org.jboss.shrinkwrap.api.importer.ZipImporter;
-import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.api.spec.ResourceAdapterArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.runner.RunWith;
 
 import com.ibm.websphere.simplicity.ShrinkHelper;
+import com.ibm.websphere.simplicity.ShrinkHelper.DeployOptions;
 
 import componenttest.annotation.Server;
+import componenttest.annotation.TestServlet;
+import componenttest.annotation.TestServlets;
 import componenttest.custom.junit.runner.FATRunner;
+import componenttest.rules.repeater.EERepeatTests;
+import componenttest.rules.repeater.RepeatTests;
 import componenttest.topology.impl.LibertyServer;
-import componenttest.topology.utils.HttpUtils;
+import componenttest.topology.utils.FATServletClient;
 
 @RunWith(FATRunner.class)
-public class EjbConstructorInjectionTest {
+public class EjbConstructorInjectionTest extends FATServletClient {
 
-    @Server("cdi12EjbConstructorInjectionServer")
+    public static final String SERVER_NAME = "cdi12EjbConstructorInjectionServer";
+    public static final String EJB_CONSTRUCTOR_INJECTION_APP_NAME = "ejbConstructorInjection";
+
+    //not bothering to repeat with EE8 ... the EE9 version is mostly a transformed version of the EE8 code
+    @ClassRule
+    public static RepeatTests r = EERepeatTests.with(SERVER_NAME, EE9, EE7_FULL);
+
+    @Server(SERVER_NAME)
+    @TestServlets({
+                    @TestServlet(servlet = com.ibm.ws.cdi.ejb.constructor.test.Servlet.class, contextRoot = EJB_CONSTRUCTOR_INJECTION_APP_NAME)
+    })
     public static LibertyServer server;
 
     @BeforeClass
     public static void setUp() throws Exception {
         WebArchive ejbConstructorInjection = ShrinkWrap.create(WebArchive.class, "ejbConstructorInjection.war")
-                        .addClass("com.ibm.ws.cdi.ejb.constructor.test.Servlet")
-                        .addClass("com.ibm.ws.cdi.ejb.constructor.test.BeanTwo")
-                        .addClass("com.ibm.ws.cdi.ejb.constructor.test.BeanThree")
-                        .addClass("com.ibm.ws.cdi.ejb.constructor.test.MyQualifier")
-                        .addClass("com.ibm.ws.cdi.ejb.constructor.test.MyForthQualifier")
-                        .addClass("com.ibm.ws.cdi.ejb.constructor.test.MyThirdQualifier")
-                        .addClass("com.ibm.ws.cdi.ejb.constructor.test.Iface")
-                        .addClass("com.ibm.ws.cdi.ejb.constructor.test.BeanFourWhichIsEJB")
-                        .addClass("com.ibm.ws.cdi.ejb.constructor.test.MySecondQualifier")
-                        .addClass("com.ibm.ws.cdi.ejb.constructor.test.BeanOne")
-                        .addClass("com.ibm.ws.cdi.ejb.constructor.test.BeanEJB")
-                        .addClass("com.ibm.ws.cdi.ejb.constructor.test.StaticState")
-                        .add(new FileAsset(new File("test-applications/ejbConstructorInjection.war/resources/META-INF/permissions.xml")), "/META-INF/permissions.xml")
-                        .add(new FileAsset(new File("test-applications/ejbConstructorInjection.war/resources/WEB-INF/web.xml")), "/WEB-INF/web.xml");
+                                                       .addClass(com.ibm.ws.cdi.ejb.constructor.test.Servlet.class)
+                                                       .addClass(com.ibm.ws.cdi.ejb.constructor.test.BeanTwo.class)
+                                                       .addClass(com.ibm.ws.cdi.ejb.constructor.test.BeanThree.class)
+                                                       .addClass(com.ibm.ws.cdi.ejb.constructor.test.MyQualifier.class)
+                                                       .addClass(com.ibm.ws.cdi.ejb.constructor.test.MyForthQualifier.class)
+                                                       .addClass(com.ibm.ws.cdi.ejb.constructor.test.MyThirdQualifier.class)
+                                                       .addClass(com.ibm.ws.cdi.ejb.constructor.test.Iface.class)
+                                                       .addClass(com.ibm.ws.cdi.ejb.constructor.test.BeanFourWhichIsEJB.class)
+                                                       .addClass(com.ibm.ws.cdi.ejb.constructor.test.MySecondQualifier.class)
+                                                       .addClass(com.ibm.ws.cdi.ejb.constructor.test.BeanOne.class)
+                                                       .addClass(com.ibm.ws.cdi.ejb.constructor.test.BeanEJB.class)
+                                                       .addClass(com.ibm.ws.cdi.ejb.constructor.test.StaticState.class)
+                                                       .add(new FileAsset(new File("test-applications/ejbConstructorInjection.war/resources/META-INF/permissions.xml")),
+                                                            "/META-INF/permissions.xml")
+                                                       .add(new FileAsset(new File("test-applications/ejbConstructorInjection.war/resources/WEB-INF/web.xml")), "/WEB-INF/web.xml");
 
-        ShrinkHelper.exportDropinAppToServer(server, ejbConstructorInjection);
+        ShrinkHelper.exportDropinAppToServer(server, ejbConstructorInjection, DeployOptions.SERVER_ONLY);
         server.startServer();
     }
 
-    @Test
-    public void testTransientReferenceOnEjbConstructor() throws Exception {
-        HttpUtils.findStringInUrl(server, "/ejbConstructorInjection/Servlet", new String[] { "destroy called",
-                                                                               "First bean message: foo",
-                                                                               "Second bean message: bar",
-                                                                               "Third bean message: spam",
-                                                                               "Forth bean message: eggs" });
+    @AfterClass
+    public static void shutdown() throws Exception {
+        if (server != null) {
+            server.stopServer();
+        }
     }
 
 }

@@ -10,28 +10,29 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.fat.tests;
 
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE7_FULL;
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE9;
+
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.ClassRule;
 import org.junit.runner.RunWith;
 
-import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ArchivePaths;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.FileAsset;
-import org.jboss.shrinkwrap.api.importer.ZipImporter;
-import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.api.spec.ResourceAdapterArchive;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-
 import com.ibm.websphere.simplicity.ShrinkHelper;
+import com.ibm.websphere.simplicity.ShrinkHelper.DeployOptions;
 
 import componenttest.annotation.Server;
+import componenttest.annotation.TestServlet;
+import componenttest.annotation.TestServlets;
 import componenttest.custom.junit.runner.FATRunner;
 import componenttest.custom.junit.runner.Mode;
 import componenttest.custom.junit.runner.Mode.TestMode;
-import componenttest.topology.utils.HttpUtils;
+import componenttest.rules.repeater.EERepeatTests;
+import componenttest.rules.repeater.RepeatTests;
 import componenttest.topology.impl.LibertyServer;
+import componenttest.topology.utils.FATServletClient;
 
 /**
  * Test Method parameter injection.
@@ -42,40 +43,42 @@ import componenttest.topology.impl.LibertyServer;
  */
 @Mode(TestMode.FULL)
 @RunWith(FATRunner.class)
-public class InjectParameterTest {
+public class InjectParameterTest extends FATServletClient {
 
-    @Server("cdi12EJB32Server")
+    public static final String SERVER_NAME = "cdi12EJB32Server";
+    public static final String INJECTED_PARAMS_APP_NAME = "injectParameters";
+
+    //not bothering to repeat with EE8 ... the EE9 version is mostly a transformed version of the EE8 code
+    @ClassRule
+    public static RepeatTests r = EERepeatTests.with(SERVER_NAME, EE9, EE7_FULL);
+
+    @Server(SERVER_NAME)
+    @TestServlets({
+                    @TestServlet(servlet = com.ibm.ws.cdi12.fat.injectparameters.TestEjbServlet.class, contextRoot = INJECTED_PARAMS_APP_NAME),
+                    @TestServlet(servlet = com.ibm.ws.cdi12.fat.injectparameters.TestServlet.class, contextRoot = INJECTED_PARAMS_APP_NAME),
+                    @TestServlet(servlet = com.ibm.ws.cdi12.fat.injectparameters.TestCdiBeanServlet.class, contextRoot = INJECTED_PARAMS_APP_NAME)
+    })
     public static LibertyServer server;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        WebArchive injectParameters = ShrinkWrap.create(WebArchive.class, "injectParameters.war")
-                        .addClass("com.ibm.ws.cdi12.fat.injectparameters.TestEjb")
-                        .addClass("com.ibm.ws.cdi12.fat.injectparameters.TestEjbServlet")
-                        .addClass("com.ibm.ws.cdi12.fat.injectparameters.TestServlet")
-                        .addClass("com.ibm.ws.cdi12.fat.injectparameters.TestProducer")
-                        .addClass("com.ibm.ws.cdi12.fat.injectparameters.TestUtils")
-                        .addClass("com.ibm.ws.cdi12.fat.injectparameters.TestCdiBean")
-                        .addClass("com.ibm.ws.cdi12.fat.injectparameters.TestCdiBeanServlet");
+        WebArchive injectParameters = ShrinkWrap.create(WebArchive.class, INJECTED_PARAMS_APP_NAME + ".war")
+                                                .addClass(com.ibm.ws.cdi12.fat.injectparameters.TestEjb.class)
+                                                .addClass(com.ibm.ws.cdi12.fat.injectparameters.TestEjbServlet.class)
+                                                .addClass(com.ibm.ws.cdi12.fat.injectparameters.TestServlet.class)
+                                                .addClass(com.ibm.ws.cdi12.fat.injectparameters.TestProducer.class)
+                                                .addClass(com.ibm.ws.cdi12.fat.injectparameters.TestResources.class)
+                                                .addClass(com.ibm.ws.cdi12.fat.injectparameters.TestCdiBean.class)
+                                                .addClass(com.ibm.ws.cdi12.fat.injectparameters.TestCdiBeanServlet.class);
 
-        ShrinkHelper.exportDropinAppToServer(server, injectParameters);
+        ShrinkHelper.exportDropinAppToServer(server, injectParameters, DeployOptions.SERVER_ONLY);
         server.startServer();
     }
 
-    private static String EXPECTED_RESPONSE = "test1, test2, test3, test4, test5, test6, test7, test8, test9, test10, test11, test12, test13, test14, test15, test16";
-
-    @Test
-    public void testServletParameterInjection() throws Exception {
-        HttpUtils.findStringInUrl(server, "/injectParameters/TestServlet", EXPECTED_RESPONSE);
-    }
-
-    @Test
-    public void testEjbParameterInjection() throws Exception {
-        HttpUtils.findStringInUrl(server, "/injectParameters/TestEjb", EXPECTED_RESPONSE);
-    }
-
-    @Test
-    public void testCdiBeanParameterInjection() throws Exception {
-        HttpUtils.findStringInUrl(server, "/injectParameters/TestCdiBean", EXPECTED_RESPONSE);
+    @AfterClass
+    public static void shutdown() throws Exception {
+        if (server != null) {
+            server.stopServer();
+        }
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 IBM Corporation and others.
+ * Copyright (c) 2016, 2021 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,8 @@ import java.lang.reflect.Field;
 
 import javax.ejb.EJB;
 import javax.servlet.annotation.WebServlet;
+
+import org.junit.Test;
 
 import componenttest.app.FATServlet;
 
@@ -44,6 +46,7 @@ public class TestServlet extends FATServlet {
                    is(not(sameInstance((Object) bean2))));
     }
 
+    @Test
     public void testWrapperClassNamesIncludeBeanName() {
         // unfortunately this test is coupled to implementation details of the wrapper class naming, and hence fragile
         assertThat("The wrapper class for the EJB with name '" + SIMPLE_EJB1 + "' should include the bean name.",
@@ -52,6 +55,7 @@ public class TestServlet extends FATServlet {
                    bean2.getClass().getSimpleName(), containsString(SIMPLE_EJB2));
     }
 
+    @Test
     public void testInternalEnterpriseBeanNames() throws Exception {
         assertThat("The internal 'enterprise bean name' for this EJB should match the name declared at the injection point.",
                    getBeanName(bean1), equalTo(SIMPLE_EJB1));
@@ -59,6 +63,7 @@ public class TestServlet extends FATServlet {
                    getBeanName(bean2), equalTo(SIMPLE_EJB2));
     }
 
+    @Test
     public void testStateIsStoredSeparately() {
         bean1.setData1("Test1");
         bean2.setData2("Test2 - this shouldn't overwrite 'Test1'");

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 IBM Corporation and others.
+ * Copyright (c) 2015, 2021 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,39 +10,43 @@
  *******************************************************************************/
 package com.ibm.ws.cdi.test.managedbean;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import org.junit.Test;
+
+import componenttest.app.FATServlet;
 
 /**
  *
  */
 @WebServlet("")
-public class ManagedBeanServlet extends HttpServlet {
+public class ManagedBeanServlet extends FATServlet {
 
     /**  */
     private static final long serialVersionUID = 1599035198651566335L;
     @Resource
     MyManagedBean myManagedBean;
 
-    @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        PrintWriter pw = response.getWriter();
+    @Test
+    public void testManagedBeanInterceptor() {
         List<String> allMsg = new ArrayList<String>();
-        allMsg.add("Begin output");
+
         allMsg.addAll(CounterUtil.getMsgList());
         allMsg.addAll(myManagedBean.getMsgList());
-        for (String msg : allMsg) {
-            pw.append(msg + " ");
-        }
 
-        pw.flush();
+        assertEquals(7, allMsg.size());
+        assertEquals("MyNonCDIInterceptor:AroundConstruct called injectedInt:16", allMsg.get(0));
+        assertEquals("MyCDIInterceptor:AroundConstruct called injectedStr:HelloYou", allMsg.get(1));
+        assertEquals("MyNonCDIInterceptor:PostConstruct called injectedInt:16", allMsg.get(2));
+        assertEquals("MyCDIInterceptor:PostConstruct called injectedStr:HelloYou", allMsg.get(3));
+        assertEquals("MyManagedBean called postConstruct()", allMsg.get(4));
+        assertEquals("MyNonCDIInterceptor:AroundInvoke called injectedInt:16", allMsg.get(5));
+        assertEquals("MyCDIInterceptor:AroundInvoke called injectedStr:HelloYou", allMsg.get(6));
     }
 }

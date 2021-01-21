@@ -10,63 +10,72 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.fat.tests;
 
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE7_FULL;
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE9;
+
 import java.io.File;
 import java.util.logging.Logger;
 
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.FileAsset;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ArchivePaths;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.FileAsset;
-import org.jboss.shrinkwrap.api.importer.ZipImporter;
-import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.api.spec.ResourceAdapterArchive;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-
 import com.ibm.websphere.simplicity.ShrinkHelper;
+import com.ibm.websphere.simplicity.ShrinkHelper.DeployOptions;
 import com.ibm.ws.fat.util.browser.WebBrowser;
 import com.ibm.ws.fat.util.browser.WebBrowserFactory;
 import com.ibm.ws.fat.util.browser.WebResponse;
 
+import componenttest.annotation.ExpectedFFDC;
 import componenttest.annotation.Server;
 import componenttest.custom.junit.runner.FATRunner;
+import componenttest.rules.repeater.EERepeatTests;
+import componenttest.rules.repeater.RepeatTests;
 import componenttest.topology.impl.LibertyServer;
-import componenttest.topology.utils.HttpUtils;
-
-import componenttest.annotation.ExpectedFFDC;
+import componenttest.topology.utils.FATServletClient;
 
 /**
  * All CDI tests with all applicable server features enabled.
  */
 @RunWith(FATRunner.class)
-public class StatefulSessionBeanInjectionTest {
+public class StatefulSessionBeanInjectionTest extends FATServletClient {
 
     private static final Logger LOG = Logger.getLogger(StatefulSessionBeanInjectionTest.class.getName());
 
-    @Server("cdi12StatefulSessionBeanServer")
-    public static LibertyServer server;
+    public static final String SERVER_NAME = "cdi12StatefulSessionBeanServer";
+    public static final String APP_NAME = "statefulSessionBeanInjection";
 
+    //not bothering to repeat with EE8 ... the EE9 version is mostly a transformed version of the EE8 code
+    @ClassRule
+    public static RepeatTests r = EERepeatTests.with(SERVER_NAME, EE9, EE7_FULL);
+
+    @Server(SERVER_NAME)
+    public static LibertyServer server;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        JavaArchive statefulSessionBeanInjection = ShrinkWrap.create(JavaArchive.class,"statefulSessionBeanInjection.jar")
-                        .addClass("com.ibm.ws.cdi12.test.implicitEJB.InjectedEJBImpl")
-                        .addClass("com.ibm.ws.cdi12.test.implicitEJB.InjectedEJB")
-                        .addClass("com.ibm.ws.cdi12.test.implicitEJB.InjectedBean1")
-                        .addClass("com.ibm.ws.cdi12.test.implicitEJB.InjectedBean2")
-                        .add(new FileAsset(new File("test-applications/statefulSessionBeanInjection.jar/resources/META-INF/beans.xml")), "/META-INF/beans.xml");
+        JavaArchive statefulSessionBeanInjection = ShrinkWrap.create(JavaArchive.class, APP_NAME + ".jar")
+                                                             .addClass(com.ibm.ws.cdi12.test.implicitEJB.InjectedEJBImpl.class)
+                                                             .addClass(com.ibm.ws.cdi12.test.implicitEJB.InjectedEJB.class)
+                                                             .addClass(com.ibm.ws.cdi12.test.implicitEJB.InjectedBean1.class)
+                                                             .addClass(com.ibm.ws.cdi12.test.implicitEJB.InjectedBean2.class)
+                                                             .add(new FileAsset(new File("test-applications/" + APP_NAME + ".jar/resources/META-INF/beans.xml")),
+                                                                  "/META-INF/beans.xml");
 
-        WebArchive statefulSessionBeanInjectionWar = ShrinkWrap.create(WebArchive.class, "statefulSessionBeanInjection.war")
-                        .addClass("com.ibm.ws.cdi12.test.implicitEJB.servlet.RemoveServlet")
-                        .addClass("com.ibm.ws.cdi12.test.implicitEJB.servlet.TestServlet")
-                        .add(new FileAsset(new File("test-applications/statefulSessionBeanInjection.war/resources/WEB-INF/beans.xml")), "/WEB-INF/beans.xml")
-                        .addAsLibrary(statefulSessionBeanInjection);
+        WebArchive statefulSessionBeanInjectionWar = ShrinkWrap.create(WebArchive.class, APP_NAME + ".war")
+                                                               .addClass(com.ibm.ws.cdi12.test.implicitEJB.servlet.RemoveServlet.class)
+                                                               .addClass(com.ibm.ws.cdi12.test.implicitEJB.servlet.TestServlet.class)
+                                                               .add(new FileAsset(new File("test-applications/" + APP_NAME + ".war/resources/WEB-INF/beans.xml")),
+                                                                    "/WEB-INF/beans.xml")
+                                                               .addAsLibrary(statefulSessionBeanInjection);
 
-        ShrinkHelper.exportDropinAppToServer(server, statefulSessionBeanInjectionWar);
+        ShrinkHelper.exportDropinAppToServer(server, statefulSessionBeanInjectionWar, DeployOptions.SERVER_ONLY);
         server.startServer();
 
     }
@@ -76,21 +85,21 @@ public class StatefulSessionBeanInjectionTest {
     public void testStatefulEJBRemoveMethod() throws Exception {
         WebBrowser wb = WebBrowserFactory.getInstance().createWebBrowser();
 
-        verifyResponse(wb, server, 
-                            "/statefulSessionBeanInjection/",
-                            "Test Sucessful! - STATE1");
+        verifyResponse(wb, server,
+                       "/statefulSessionBeanInjection/",
+                       "Test Sucessful! - STATE1");
 
-        verifyResponse(wb, server, 
-                            "/statefulSessionBeanInjection/",
-                            "Test Sucessful! - STATE2");
+        verifyResponse(wb, server,
+                       "/statefulSessionBeanInjection/",
+                       "Test Sucessful! - STATE2");
 
-        verifyResponse(wb, server, 
-                            "/statefulSessionBeanInjection/remove",
-                            "EJB Removed!");
+        verifyResponse(wb, server,
+                       "/statefulSessionBeanInjection/remove",
+                       "EJB Removed!");
 
-        verifyResponse(wb, server, 
-                            "/statefulSessionBeanInjection/",
-                            "NoSuchEJBException");
+        verifyResponse(wb, server,
+                       "/statefulSessionBeanInjection/",
+                       "NoSuchEJBException");
         // TODO Note that we stop the server in the test so that the expected FFDC on shutdown
         // happens in the testcase.  It is questionable that this FFDC is produced here.
         // It makes for the appearance of some leak with removed EJBs in the weld session
@@ -111,5 +120,11 @@ public class StatefulSessionBeanInjectionTest {
         return "http://" + server.getHostname() + ":" + server.getHttpDefaultPort() + path;
     }
 
+    @AfterClass
+    public static void shutdown() throws Exception {
+        if (server != null) {
+            server.stopServer();
+        }
+    }
 
 }

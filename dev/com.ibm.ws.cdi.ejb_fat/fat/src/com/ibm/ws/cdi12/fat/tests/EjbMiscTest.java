@@ -11,97 +11,98 @@
 package com.ibm.ws.cdi12.fat.tests;
 
 import static componenttest.custom.junit.runner.Mode.TestMode.FULL;
-import static org.junit.Assert.assertNotNull;
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE7_FULL;
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE9;
 
 import java.io.File;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
-
-import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.FileAsset;
-import org.jboss.shrinkwrap.api.importer.ZipImporter;
-import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.api.spec.ResourceAdapterArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-
-import com.ibm.ws.fat.util.LoggingTest;
-import com.ibm.ws.fat.util.ShrinkWrapSharedServer;
-import com.ibm.ws.fat.util.browser.WebBrowser;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.runner.RunWith;
 
 import com.ibm.websphere.simplicity.ShrinkHelper;
+import com.ibm.websphere.simplicity.ShrinkHelper.DeployOptions;
 
 import componenttest.annotation.Server;
+import componenttest.annotation.TestServlet;
+import componenttest.annotation.TestServlets;
 import componenttest.custom.junit.runner.FATRunner;
 import componenttest.custom.junit.runner.Mode;
+import componenttest.rules.repeater.EERepeatTests;
+import componenttest.rules.repeater.RepeatTests;
 import componenttest.topology.impl.LibertyServer;
-import componenttest.topology.utils.HttpUtils;
-
+import componenttest.topology.utils.FATServletClient;
 
 /**
  * Scope tests for EJBs
  */
 @Mode(FULL)
 @RunWith(FATRunner.class)
-public class EjbMiscTest {
+public class EjbMiscTest extends FATServletClient {
 
-    @Server("cdi12EjbConstructorInjectionServer")
+    public static final String SERVER_NAME = "cdi12EjbConstructorInjectionServer";
+    public static final String EJB_SCOPE_APP_NAME = "ejbScope";
+    public static final String MULTIPLE_WAR1_APP_NAME = "multipleWar1";
+    public static final String MULTIPLE_WAR2_APP_NAME = "multipleWar2";
+
+    //not bothering to repeat with EE8 ... the EE9 version is mostly a transformed version of the EE8 code
+    @ClassRule
+    public static RepeatTests r = EERepeatTests.with(SERVER_NAME, EE9, EE7_FULL);
+
+    @Server(SERVER_NAME)
+    @TestServlets({
+                    @TestServlet(servlet = com.ibm.ws.cdi12.test.ejb.scope.PostConstructScopeServlet.class, contextRoot = EJB_SCOPE_APP_NAME),
+                    @TestServlet(servlet = test.multipleWar1.TestServlet.class, contextRoot = MULTIPLE_WAR1_APP_NAME),
+                    @TestServlet(servlet = test.multipleWar2.TestServlet.class, contextRoot = MULTIPLE_WAR2_APP_NAME)
+    })
     public static LibertyServer server;
 
     @BeforeClass
-    public static void setUp() throws Exception  {
-       
-        JavaArchive multipleWarEmbeddedJar = ShrinkWrap.create(JavaArchive.class,"multipleWarEmbeddedJar.jar")
-                    .addClass("com.ibm.ws.cdi.lib.MyEjb");
+    public static void setUp() throws Exception {
 
-        WebArchive multipleWarOne = ShrinkWrap.create(WebArchive.class, "multipleWar1.war")
-                    .addClass("test.multipleWar1.TestServlet")
-                    .addClass("test.multipleWar1.MyBean")
-                    .add(new FileAsset(new File("test-applications/multipleWar1.war/resources/WEB-INF/ejb-jar.xml")), "/WEB-INF/ejb-jar.xml")
-                    .add(new FileAsset(new File("test-applications/multipleWar1.war/resources/WEB-INF/beans.xml")), "/WEB-INF/beans.xml")
-                    .addAsLibrary(multipleWarEmbeddedJar);
+        JavaArchive multipleWarEmbeddedJar = ShrinkWrap.create(JavaArchive.class, "multipleWarEmbeddedJar.jar")
+                                                       .addClass("com.ibm.ws.cdi.lib.MyEjb");
 
-        WebArchive multipleWarTwo = ShrinkWrap.create(WebArchive.class, "multipleWar2.war")
-                    .addClass("test.multipleWar2.TestServlet")
-                    .addClass("test.multipleWar2.MyBean")
-                    .add(new FileAsset(new File("test-applications/multipleWar2.war/resources/WEB-INF/ejb-jar.xml")), "/WEB-INF/ejb-jar.xml")
-                    .add(new FileAsset(new File("test-applications/multipleWar2.war/resources/WEB-INF/beans.xml")), "/WEB-INF/beans.xml")
-                    .addAsLibrary(multipleWarEmbeddedJar);
+        WebArchive multipleWarOne = ShrinkWrap.create(WebArchive.class, MULTIPLE_WAR1_APP_NAME + ".war")
+                                              .addClass(test.multipleWar1.TestServlet.class)
+                                              .addClass(test.multipleWar1.MyBean.class)
+                                              .add(new FileAsset(new File("test-applications/" + MULTIPLE_WAR1_APP_NAME + ".war/resources/WEB-INF/ejb-jar.xml")),
+                                                   "/WEB-INF/ejb-jar.xml")
+                                              .add(new FileAsset(new File("test-applications/" + MULTIPLE_WAR1_APP_NAME + ".war/resources/WEB-INF/beans.xml")),
+                                                   "/WEB-INF/beans.xml")
+                                              .addAsLibrary(multipleWarEmbeddedJar);
 
-        WebArchive ejbScope = ShrinkWrap.create(WebArchive.class, "ejbScope.war")
-                    .addClass("com.ibm.ws.cdi12.test.ejb.scope.PostConstructingStartupBean")
-                    .addClass("com.ibm.ws.cdi12.test.ejb.scope.PostConstructScopeServlet")
-                    .addClass("com.ibm.ws.cdi12.test.ejb.scope.RequestScopedBean");
+        WebArchive multipleWarTwo = ShrinkWrap.create(WebArchive.class, MULTIPLE_WAR2_APP_NAME + ".war")
+                                              .addClass(test.multipleWar2.TestServlet.class)
+                                              .addClass(test.multipleWar2.MyBean.class)
+                                              .add(new FileAsset(new File("test-applications/" + MULTIPLE_WAR2_APP_NAME + ".war/resources/WEB-INF/ejb-jar.xml")),
+                                                   "/WEB-INF/ejb-jar.xml")
+                                              .add(new FileAsset(new File("test-applications/" + MULTIPLE_WAR2_APP_NAME + ".war/resources/WEB-INF/beans.xml")),
+                                                   "/WEB-INF/beans.xml")
+                                              .addAsLibrary(multipleWarEmbeddedJar);
 
-        ShrinkHelper.exportDropinAppToServer(server, multipleWarOne);
-        ShrinkHelper.exportDropinAppToServer(server, multipleWarTwo);
-        ShrinkHelper.exportDropinAppToServer(server, ejbScope);
+        WebArchive ejbScope = ShrinkWrap.create(WebArchive.class, EJB_SCOPE_APP_NAME + ".war")
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.scope.PostConstructingStartupBean.class)
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.scope.PostConstructScopeServlet.class)
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.scope.RequestScopedBean.class);
+
+        ShrinkHelper.exportDropinAppToServer(server, multipleWarOne, DeployOptions.SERVER_ONLY);
+        ShrinkHelper.exportDropinAppToServer(server, multipleWarTwo, DeployOptions.SERVER_ONLY);
+        ShrinkHelper.exportDropinAppToServer(server, ejbScope, DeployOptions.SERVER_ONLY);
 
         server.startServer();
     }
 
-    /**
-     * Test that the request scope is active during postConstruct for an eager singleton bean.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testPostConstructRequestScope() throws Exception {
-
-        HttpUtils.findStringInUrl(server, "/ejbScope/PostConstructScope", "true");
-    }
-
-    @Test
-    public void testDupEJBClassNames() throws Exception {
-
-        HttpUtils.findStringInUrl(server, "/multipleWar1", "MyEjb myWar1Bean");
-        HttpUtils.findStringInUrl(server, "/multipleWar2", "MyEjb myWar2Bean");
+    @AfterClass
+    public static void shutdown() throws Exception {
+        if (server != null) {
+            server.stopServer();
+        }
     }
 
 }

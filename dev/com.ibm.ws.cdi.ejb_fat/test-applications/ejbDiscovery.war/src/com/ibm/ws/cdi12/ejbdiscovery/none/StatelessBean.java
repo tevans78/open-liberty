@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2021 IBM Corporation and others.
+ * Copyright (c) 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,25 +8,16 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.ibm.ws.cdi12.fat.injectparameters;
+package com.ibm.ws.cdi12.ejbdiscovery.none;
 
-import javax.ejb.EJB;
-import javax.servlet.annotation.WebServlet;
+import javax.ejb.Stateless;
 
-import org.junit.Test;
+import com.ibm.ws.cdi12.ejbdiscovery.ejbs.interfaces.StatelessLocal;
 
-import componenttest.app.FATServlet;
-
-@SuppressWarnings("serial")
-@WebServlet("/TestEjb")
-public class TestEjbServlet extends FATServlet {
-
-    @EJB
-    TestEjb ejb;
-
-    @Test
-    public void testEjbParameterInjection() throws Exception {
-        ejb.getResult().validate();
-    }
+/**
+ * Session Bean implementation class StatelessBean
+ */
+@Stateless
+public class StatelessBean implements StatelessLocal {
 
 }

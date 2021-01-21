@@ -10,42 +10,100 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.fat.tests;
 
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE7_FULL;
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE9;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
+import java.io.File;
 
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.FileAsset;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
-import junit.framework.AssertionFailedError;
+import org.junit.runner.RunWith;
 
-import com.ibm.ws.fat.util.browser.WebBrowser;
-import com.ibm.ws.fat.util.browser.WebBrowserException;
-import com.ibm.ws.fat.util.browser.WebResponse;
+import com.ibm.websphere.simplicity.ShrinkHelper;
+import com.ibm.websphere.simplicity.ShrinkHelper.DeployOptions;
 
 import componenttest.annotation.AllowedFFDC;
 import componenttest.annotation.Server;
 import componenttest.annotation.TestServlet;
 import componenttest.annotation.TestServlets;
+import componenttest.custom.junit.runner.FATRunner;
+import componenttest.rules.repeater.EERepeatTests;
+import componenttest.rules.repeater.RepeatTests;
 import componenttest.topology.impl.LibertyServer;
+import componenttest.topology.utils.FATServletClient;
 import componenttest.topology.utils.HttpUtils;
 
-public class AroundConstructEjbTest extends AroundConstructTestBase {
+@RunWith(FATRunner.class)
+public class AroundConstructEjbTest extends FATServletClient {
 
-    @Server("cdi12EJB32Server")
+    public static final String AROUND_CONSTRUCT_APP_NAME = "aroundConstructApp";
+    public static final String SERVER_NAME = "cdi12EJB32Server";
+
+    //not bothering to repeat with EE8 ... the EE9 version is mostly a transformed version of the EE8 code
+    @ClassRule
+    public static RepeatTests r = EERepeatTests.with(SERVER_NAME, EE9, EE7_FULL);
+
+    @Server(SERVER_NAME)
     @TestServlets({
-                    @TestServlet(servlet = com.ibm.ws.cdi12.test.aroundconstruct.BeanServlet.class, contextRoot = APP_NAME) 
+                    @TestServlet(servlet = com.ibm.ws.cdi12.test.aroundconstruct.EjbServlet.class, contextRoot = AROUND_CONSTRUCT_APP_NAME),
+                    @TestServlet(servlet = com.ibm.ws.cdi12.test.aroundconstruct.BeanServlet.class, contextRoot = AROUND_CONSTRUCT_APP_NAME)
     })
     public static LibertyServer server;
 
-    @Test
-    public void testStatelessAroundConstruct() {}
-
     @BeforeClass
     public static void setUp() throws Exception {
-        serverRef = server;
-        AroundConstructTestBase.setUp();
+
+        JavaArchive utilLib = ShrinkWrap.create(JavaArchive.class,
+                                                "utilLib.jar")
+                                        .addClass(com.ibm.ws.cdi12.test.utils.Intercepted.class)
+                                        .addClass(com.ibm.ws.cdi12.test.utils.Utils.class)
+                                        .add(new FileAsset(new File("test-applications/utilLib.jar/resources/META-INF/beans.xml")),
+                                             "/META-INF/beans.xml");
+
+        WebArchive aroundConstructApp = ShrinkWrap.create(WebArchive.class,
+                                                          AROUND_CONSTRUCT_APP_NAME + ".war")
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.AroundConstructLogger.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.StatelessAroundConstructLogger.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.Ejb.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.Bean.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.interceptors.SuperConstructInterceptor.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.interceptors.InterceptorTwoBinding.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.interceptors.DirectlyIntercepted.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.interceptors.InterceptorOne.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.interceptors.SubConstructInterceptor.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.interceptors.DirectBindingConstructInterceptor.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.interceptors.NonCdiInterceptor.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.interceptors.ConstructInterceptor.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.interceptors.InterceptorOneBinding.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.interceptors.InterceptorTwo.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.EjbServlet.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.BeanServlet.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.AroundConstructTestServlet.class)
+                                                  .addClass(com.ibm.ws.cdi12.test.aroundconstruct.StatelessEjb.class)
+                                                  .add(new FileAsset(new File("test-applications/aroundConstructApp.war/resources/WEB-INF/beans.xml")),
+                                                       "/WEB-INF/beans.xml")
+                                                  .addAsLibrary(utilLib);
+
+        WebArchive postConstructErrorMessageApp = ShrinkWrap.create(WebArchive.class,
+                                                                    "postConstructErrorMessageApp.war")
+                                                            .addClass(com.ibm.ws.cdi12.test.errormessage.ErrorMessageServlet.class)
+                                                            .addClass(com.ibm.ws.cdi12.test.errormessage.interceptors.ErrorMessageInterceptor.class)
+                                                            .addClass(com.ibm.ws.cdi12.test.errormessage.interceptors.ErrorMessageInterceptorBinding.class)
+                                                            .addClass(com.ibm.ws.cdi12.test.errormessage.ErrorMessageTestEjb.class)
+                                                            .add(new FileAsset(new File("test-applications/postConstructErrorMessageApp.war/resources/WEB-INF/beans.xml")),
+                                                                 "/WEB-INF/beans.xml")
+                                                            .addAsLibrary(utilLib);
+
+        ShrinkHelper.exportDropinAppToServer(server, aroundConstructApp, DeployOptions.SERVER_ONLY);
+        ShrinkHelper.exportDropinAppToServer(server, postConstructErrorMessageApp, DeployOptions.SERVER_ONLY);
+        server.startServer();
     }
 
     @Test
@@ -56,7 +114,7 @@ public class AroundConstructEjbTest extends AroundConstructTestBase {
         try {
             HttpUtils.findStringInUrl(server, "/postConstructErrorMessageApp/errorMessageTestServlet", " "); //Just to poke the url
         } catch (Throwable e1) {
-            //The request fails with HTTP status 500, that triggers an AssertionFailedError in HttpUtils. Since we're looking for an error in the logs I believe a status 500 is expected behaviour. 
+            //The request fails with HTTP status 500, that triggers an AssertionFailedError in HttpUtils. Since we're looking for an error in the logs I believe a status 500 is expected behaviour.
         }
         try {
             errMsgCount = server.findStringsInLogs("CWOWB2001E(?=.*POST_CONSTRUCT)(?=.*java.lang.IllegalStateException)").size();

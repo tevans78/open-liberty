@@ -8,23 +8,11 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.ibm.ws.cdi12.fat.injectparameters;
+package com.ibm.ws.cdi12.ejbdiscovery.none;
 
-import java.util.List;
+import javax.ejb.Local;
 
-public class TestUtils {
+@Local
+public interface StatelessLocal {
 
-    public static String join(List<String> stringList) {
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (String string : stringList) {
-            if (!first) {
-                sb.append(", ");
-            } else {
-                first = false;
-            }
-            sb.append(string);
-        }
-        return sb.toString();
-    }
 }

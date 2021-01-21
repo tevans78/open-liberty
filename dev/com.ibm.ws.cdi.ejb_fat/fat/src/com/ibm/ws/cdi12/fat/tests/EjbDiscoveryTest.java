@@ -10,128 +10,87 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.fat.tests;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE7_FULL;
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE9;
 
 import java.io.File;
-import java.util.stream.Collectors;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.FileAsset;
-import org.jboss.shrinkwrap.api.importer.ZipImporter;
-import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.api.spec.ResourceAdapterArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.runner.RunWith;
 
 import com.ibm.websphere.simplicity.ShrinkHelper;
+import com.ibm.websphere.simplicity.ShrinkHelper.DeployOptions;
 
 import componenttest.annotation.Server;
+import componenttest.annotation.TestServlet;
+import componenttest.annotation.TestServlets;
 import componenttest.custom.junit.runner.FATRunner;
-import componenttest.topology.utils.HttpUtils;
+import componenttest.rules.repeater.EERepeatTests;
+import componenttest.rules.repeater.RepeatTests;
 import componenttest.topology.impl.LibertyServer;
+import componenttest.topology.utils.FATServletClient;
 
 /**
  * Test to ensure that we correctly discover and fire events for types and beans which are EJBs
  */
 @RunWith(FATRunner.class)
-public class EjbDiscoveryTest {
+public class EjbDiscoveryTest extends FATServletClient {
 
-    @Server("cdi12EjbDiscoveryServer")
+    public static final String SERVER_NAME = "cdi12EjbDiscoveryServer";
+    public static final String EJB_DISCOVERY_APP_NAME = "ejbDiscovery";
+
+    //not bothering to repeat with EE8 ... the EE9 version is mostly a transformed version of the EE8 code
+    @ClassRule
+    public static RepeatTests r = EERepeatTests.with(SERVER_NAME, EE9, EE7_FULL);
+
+    @Server(SERVER_NAME)
+    @TestServlets({
+                    @TestServlet(servlet = com.ibm.ws.cdi12.ejbdiscovery.servlet.DiscoveryServlet.class, contextRoot = EJB_DISCOVERY_APP_NAME)
+    })
     public static LibertyServer server;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        WebArchive ejbDiscovery = ShrinkWrap.create(WebArchive.class, "ejbDiscovery.war")
-                        .addClass("com.ibm.ws.cdi12.ejbdiscovery.extension.DiscoveryExtension")
-                        .addClass("com.ibm.ws.cdi12.ejbdiscovery.servlet.DiscoveryServlet")
-                        .addClass("com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonDdBean")
-                        .addClass("com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessBean")
-                        .addClass("com.ibm.ws.cdi12.ejbdiscovery.ejbs.interfaces.StatelessLocal")
-                        .addClass("com.ibm.ws.cdi12.ejbdiscovery.ejbs.interfaces.StatelessDdLocal")
-                        .addClass("com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessDdBean")
-                        .addClass("com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulDdBean")
-                        .addClass("com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonBean")
-                        .addClass("com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulBean")
-                        .add(new FileAsset(new File("test-applications/ejbDiscovery.war/resources/WEB-INF/ejb-jar.xml")), "/WEB-INF/ejb-jar.xml")
-                        .add(new FileAsset(new File("test-applications/ejbDiscovery.war/resources/WEB-INF/beans.xml")), "/WEB-INF/beans.xml")
-                        .add(new FileAsset(new File("test-applications/ejbDiscovery.war/resources/META-INF/services/javax.enterprise.inject.spi.Extension")), "/META-INF/services/javax.enterprise.inject.spi.Extension");
+        JavaArchive ejbDiscoveryNone = ShrinkWrap.create(JavaArchive.class,
+                                                         EJB_DISCOVERY_APP_NAME + "None.jar")
+                                                 .addClass(com.ibm.ws.cdi12.ejbdiscovery.none.StatelessBean.class)
+                                                 .addClass(com.ibm.ws.cdi12.ejbdiscovery.none.StatelessLocal.class)
+                                                 .add(new FileAsset(new File("test-applications/" + EJB_DISCOVERY_APP_NAME + "None.jar/resources/WEB-INF/beans.xml")),
+                                                      "/META-INF/beans.xml");
 
-        ShrinkHelper.exportDropinAppToServer(server, ejbDiscovery);
+        WebArchive ejbDiscovery = ShrinkWrap.create(WebArchive.class, EJB_DISCOVERY_APP_NAME + ".war")
+                                            .addClass(com.ibm.ws.cdi12.ejbdiscovery.extension.DiscoveryExtension.class)
+                                            .addClass(com.ibm.ws.cdi12.ejbdiscovery.servlet.DiscoveryServlet.class)
+                                            .addClass(com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonDdBean.class)
+                                            .addClass(com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessBean.class)
+                                            .addClass(com.ibm.ws.cdi12.ejbdiscovery.ejbs.interfaces.StatelessLocal.class)
+                                            .addClass(com.ibm.ws.cdi12.ejbdiscovery.ejbs.interfaces.StatelessDdLocal.class)
+                                            .addClass(com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessDdBean.class)
+                                            .addClass(com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulDdBean.class)
+                                            .addClass(com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonBean.class)
+                                            .addClass(com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulBean.class)
+                                            .add(new FileAsset(new File("test-applications/" + EJB_DISCOVERY_APP_NAME + ".war/resources/WEB-INF/ejb-jar.xml")),
+                                                 "/WEB-INF/ejb-jar.xml")
+                                            .add(new FileAsset(new File("test-applications/" + EJB_DISCOVERY_APP_NAME + ".war/resources/WEB-INF/beans.xml")), "/WEB-INF/beans.xml")
+                                            .add(new FileAsset(new File("test-applications/" + EJB_DISCOVERY_APP_NAME
+                                                                        + ".war/resources/META-INF/services/javax.enterprise.inject.spi.Extension")),
+                                                 "/META-INF/services/javax.enterprise.inject.spi.Extension")
+                                            .addAsLibrary(ejbDiscoveryNone);
+
+        ShrinkHelper.exportDropinAppToServer(server, ejbDiscovery, DeployOptions.SERVER_ONLY);
         server.startServer();
     }
 
-    private String getObservations() throws Exception {
-        return HttpUtils.getResponseBody(HttpUtils.getHttpConnection(server, "/ejbDiscovery")).lines().collect(Collectors.joining());
+    @AfterClass
+    public static void shutdown() throws Exception {
+        if (server != null) {
+            server.stopServer();
+        }
     }
-
-    @Test
-    public void testAnnotatedTypesDiscovered() throws Exception {
-        String observations = getObservations();
-        assertThat(observations, containsString("Observed type: com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonBean"));
-        assertThat(observations, containsString("Observed type: com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulBean"));
-        assertThat(observations, containsString("Observed type: com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessBean"));
-    }
-
-    @Test
-    public void testDeploymentDescriptorTypesDiscovered() throws Exception {
-        String observations = getObservations();
-        assertThat(observations, containsString("Observed type: com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonDdBean"));
-        assertThat(observations, containsString("Observed type: com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulDdBean"));
-        assertThat(observations, containsString("Observed type: com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessDdBean"));
-    }
-
-    @Test
-    public void testAnnotatedBeansDiscovered() throws Exception {
-        String observations = getObservations();
-        assertThat(observations, containsString("Observed bean: com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonBean"));
-        assertThat(observations, containsString("Observed bean: com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulBean"));
-        assertThat(observations, containsString("Observed bean: com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessBean"));
-    }
-
-    @Test
-    public void testDeploymentDescriptorBeansDiscovered() throws Exception {
-        String observations = getObservations();
-        assertThat(observations, containsString("Observed bean: com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonDdBean"));
-        assertThat(observations, containsString("Observed bean: com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulDdBean"));
-        assertThat(observations, containsString("Observed bean: com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessDdBean"));
-    }
-
-    @Test
-    public void testNoInterfaceTypesDiscovered() throws Exception {
-        String observations = getObservations();
-        // The singleton and stateful beans have a no-interface view
-        assertThat(observations, containsString("Observed bean type: class com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonBean"));
-        assertThat(observations, containsString("Observed bean type: class com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulBean"));
-        assertThat(observations, containsString("Observed bean type: class com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonDdBean"));
-        assertThat(observations, containsString("Observed bean type: class com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulDdBean"));
-    }
-
-    @Test
-    public void testInterfaceTypesDiscovered() throws Exception {
-        String observations = getObservations();
-        // The two stateless beans have a local interface defined
-        assertThat(observations, containsString("Observed bean type: interface com.ibm.ws.cdi12.ejbdiscovery.ejbs.interfaces.StatelessLocal"));
-        assertThat(observations, containsString("Observed bean type: interface com.ibm.ws.cdi12.ejbdiscovery.ejbs.interfaces.StatelessDdLocal"));
-
-        // The actual bean type should not be visible
-        assertThat(observations, not(containsString("Observed bean type: class com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessBean")));
-        assertThat(observations, not(containsString("Observed bean type: class com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessDdBean")));
-    }
-
-    @Test
-    public void testModeNoneNotDiscovered() throws Exception {
-        String observations = getObservations();
-        // There is a stateless bean that should not be discovered because the .war has discovery-mode=none
-        assertThat(observations, not(containsString("Observed bean type: class com.ibm.ws.cdi12.ejbdiscovery.none.ejbs.StatelessBean")));
-        assertThat(observations, not(containsString("Observed bean: com.ibm.ws.cdi12.ejbdiscovery.none.ejbs.StatelessBean")));
-    }
-
 }

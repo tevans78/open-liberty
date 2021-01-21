@@ -10,68 +10,76 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.fat.tests;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE7_FULL;
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE9;
 
 import java.io.File;
 import java.util.logging.Logger;
 
-import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.FileAsset;
-import org.jboss.shrinkwrap.api.importer.ZipImporter;
-import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.api.spec.ResourceAdapterArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.ibm.websphere.simplicity.ShrinkHelper;
+import com.ibm.websphere.simplicity.ShrinkHelper.DeployOptions;
 import com.ibm.ws.fat.util.browser.WebBrowser;
 import com.ibm.ws.fat.util.browser.WebBrowserFactory;
 import com.ibm.ws.fat.util.browser.WebResponse;
 
 import componenttest.annotation.Server;
 import componenttest.custom.junit.runner.FATRunner;
-import componenttest.topology.utils.HttpUtils;
+import componenttest.rules.repeater.EERepeatTests;
+import componenttest.rules.repeater.RepeatTests;
 import componenttest.topology.impl.LibertyServer;
+import componenttest.topology.utils.FATServletClient;
 
 /**
  * Asynchronous CDI tests with EJB Timers and Scheduled Tasks
  */
 @RunWith(FATRunner.class)
-public class EjbTimerTest {
+public class EjbTimerTest extends FATServletClient {
 
     private static final Logger LOG = Logger.getLogger(EjbTimerTest.class.getName());
 
-    @Server("cdi12EJB32Server")
+    public static final String SERVER_NAME = "cdi12EJB32Server";
+    public static final String EJB_TIMER_APP_NAME = "ejbTimer";
+
+    //not bothering to repeat with EE8 ... the EE9 version is mostly a transformed version of the EE8 code
+    @ClassRule
+    public static RepeatTests r = EERepeatTests.with(SERVER_NAME, EE9, EE7_FULL);
+
+    @Server(SERVER_NAME)
     public static LibertyServer server;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        WebArchive ejbTimer = ShrinkWrap.create(WebArchive.class, "ejbTimer.war")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.timer.IncrementCountersRunnableTask")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.timer.SessionScopedCounter")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.timer.TestEjbTimerTimeOutServlet")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.timer.RequestScopedCounter")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.timer.EjbSessionBean2")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.timer.view.EjbSessionBeanLocal")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.timer.view.SessionBeanLocal")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.timer.view.EjbSessionBean2Local")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.timer.ApplicationScopedCounter")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.timer.SessionBean")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.timer.TestEjbNoTimerServlet")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.timer.RequestScopedBean")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.timer.TestEjbTimerServlet")
-                        .addClass("com.ibm.ws.cdi12.test.ejb.timer.EjbSessionBean")
-                        .add(new FileAsset(new File("test-applications/ejbTimer.war/resources/META-INF/permissions.xml")), "/META-INF/permissions.xml")
-                        .add(new FileAsset(new File("test-applications/ejbTimer.war/resources/WEB-INF/beans.xml")), "/WEB-INF/beans.xml");
+        WebArchive ejbTimer = ShrinkWrap.create(WebArchive.class, EJB_TIMER_APP_NAME + ".war")
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.timer.IncrementCountersRunnableTask.class)
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.timer.SessionScopedCounter.class)
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.timer.TestEjbTimerTimeOutServlet.class)
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.timer.RequestScopedCounter.class)
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.timer.EjbSessionBean2.class)
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.timer.view.EjbSessionBeanLocal.class)
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.timer.view.SessionBeanLocal.class)
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.timer.view.EjbSessionBean2Local.class)
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.timer.ApplicationScopedCounter.class)
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.timer.SessionBean.class)
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.timer.TestEjbNoTimerServlet.class)
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.timer.RequestScopedBean.class)
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.timer.TestEjbTimerServlet.class)
+                                        .addClass(com.ibm.ws.cdi12.test.ejb.timer.EjbSessionBean.class)
+                                        .add(new FileAsset(new File("test-applications/" + EJB_TIMER_APP_NAME + ".war/resources/META-INF/permissions.xml")),
+                                             "/META-INF/permissions.xml")
+                                        .add(new FileAsset(new File("test-applications/" + EJB_TIMER_APP_NAME + ".war/resources/WEB-INF/beans.xml")), "/WEB-INF/beans.xml");
 
-        ShrinkHelper.exportDropinAppToServer(server, ejbTimer);
+        ShrinkHelper.exportDropinAppToServer(server, ejbTimer, DeployOptions.SERVER_ONLY);
         server.startServer();
     }
-
 
     /**
      * Verifies that a Session Scoped counter works correctly when incremented via either a
@@ -102,8 +110,8 @@ public class EjbTimerTest {
         verifyResponse(wb, server, "/ejbTimer/timerTimeOut", "counter = 1");
     }
 
-    private WebResponse verifyResponse(WebBrowser webBrowser, LibertyServer server, String resource, String expectedResponse) throws Exception {
-        String url = this.createURL(server, resource);
+    private static WebResponse verifyResponse(WebBrowser webBrowser, LibertyServer server, String resource, String expectedResponse) throws Exception {
+        String url = createURL(server, resource);
         WebResponse response = webBrowser.request(url);
         LOG.info("Response from webBrowser: " + response.getResponseBody());
         response.verifyResponseBodyContains(expectedResponse);
@@ -114,6 +122,13 @@ public class EjbTimerTest {
         if (!path.startsWith("/"))
             path = "/" + path;
         return "http://" + server.getHostname() + ":" + server.getHttpDefaultPort() + path;
+    }
+
+    @AfterClass
+    public static void shutdown() throws Exception {
+        if (server != null) {
+            server.stopServer();
+        }
     }
 
 }

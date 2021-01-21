@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2018 IBM Corporation and others.
+ * Copyright (c) 2014, 2021 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,113 +10,89 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.fat.tests;
 
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE7_FULL;
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE9;
+
 import java.io.File;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.junit.Assert;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.FileAsset;
-import org.jboss.shrinkwrap.api.importer.ZipImporter;
-import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.api.spec.ResourceAdapterArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.ibm.websphere.simplicity.ShrinkHelper;
-
-import com.ibm.ws.fat.util.SharedServer;
-import com.ibm.ws.fat.util.LoggingTest;
+import com.ibm.websphere.simplicity.ShrinkHelper.DeployOptions;
 
 import componenttest.annotation.ExpectedFFDC;
+import componenttest.annotation.Server;
+import componenttest.annotation.TestServlet;
+import componenttest.annotation.TestServlets;
+import componenttest.custom.junit.runner.FATRunner;
+import componenttest.rules.repeater.EERepeatTests;
+import componenttest.rules.repeater.RepeatTests;
 import componenttest.topology.impl.LibertyServer;
-import componenttest.topology.impl.LibertyServerFactory;
+import componenttest.topology.utils.FATServletClient;
 import componenttest.topology.utils.HttpUtils;
 
-public class CDIManagedBeanInterceptorTest extends LoggingTest {
+@RunWith(FATRunner.class)
+public class CDIManagedBeanInterceptorTest extends FATServletClient {
 
-    private static LibertyServer server;
-    private static boolean hasSetUp = false;
+    public static final String SERVER_NAME = "cdi12ManagedBeanTestServer";
+    public static final String MANAGED_BEAN_APP_NAME = "managedBeanApp";
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.ibm.ws.fat.LoggingTest#getSharedServer()
-     */
+    //not bothering to repeat with EE8 ... the EE9 version is mostly a transformed version of the EE8 code
+    @ClassRule
+    public static RepeatTests r = EERepeatTests.with(SERVER_NAME, EE9, EE7_FULL);
 
-    @Override
-    protected SharedServer getSharedServer() {
-        return null;
-    }
+    @Server(SERVER_NAME)
+    @TestServlets({
+                    @TestServlet(servlet = com.ibm.ws.cdi.test.managedbean.ManagedBeanServlet.class, contextRoot = MANAGED_BEAN_APP_NAME)
+    })
+    public static LibertyServer server;
 
     @BeforeClass
     public static void setUp() throws Exception {
+        WebArchive managedBeanApp = ShrinkWrap.create(WebArchive.class, MANAGED_BEAN_APP_NAME + ".war")
+                                              .addClass(com.ibm.ws.cdi.test.managedbean.CounterUtil.class)
+                                              .addClass(com.ibm.ws.cdi.test.managedbean.ManagedBeanServlet.class)
+                                              .addClass(com.ibm.ws.cdi.test.managedbean.MyEJBBean.class)
+                                              .addClass(com.ibm.ws.cdi.test.managedbean.interceptors.MyInterceptorBase.class)
+                                              .addClass(com.ibm.ws.cdi.test.managedbean.interceptors.MyNonCDIInterceptor.class)
+                                              .addClass(com.ibm.ws.cdi.test.managedbean.interceptors.MyCDIInterceptorBinding.class)
+                                              .addClass(com.ibm.ws.cdi.test.managedbean.interceptors.MyCDIInterceptor.class)
+                                              .addClass(com.ibm.ws.cdi.test.managedbean.MyEJBBeanLocal.class)
+                                              .addClass(com.ibm.ws.cdi.test.managedbean.MyManagedBean.class)
+                                              .add(new FileAsset(new File("test-applications/" + MANAGED_BEAN_APP_NAME + ".war/resources/WEB-INF/web.xml")), "/WEB-INF/web.xml");
 
-        if (!hasSetUp){
-            hasSetUp = true;
-            WebArchive managedBeanApp = ShrinkWrap.create(WebArchive.class, "managedBeanApp.war")
-                        .addClass("com.ibm.ws.cdi.test.managedbean.CounterUtil")
-                        .addClass("com.ibm.ws.cdi.test.managedbean.ManagedBeanServlet")
-                        .addClass("com.ibm.ws.cdi.test.managedbean.MyEJBBean")
-                        .addClass("com.ibm.ws.cdi.test.managedbean.interceptors.MyInterceptorBase")
-                        .addClass("com.ibm.ws.cdi.test.managedbean.interceptors.MyNonCDIInterceptor")
-                        .addClass("com.ibm.ws.cdi.test.managedbean.interceptors.MyCDIInterceptorBinding")
-                        .addClass("com.ibm.ws.cdi.test.managedbean.interceptors.MyCDIInterceptor")
-                        .addClass("com.ibm.ws.cdi.test.managedbean.MyEJBBeanLocal")
-                        .addClass("com.ibm.ws.cdi.test.managedbean.MyManagedBean")
-                        .add(new FileAsset(new File("test-applications/managedBeanApp.war/resources/WEB-INF/web.xml")), "/WEB-INF/web.xml");
-
-            server = LibertyServerFactory.getStartedLibertyServer("cdi12ManagedBeanTestServer");
-            ShrinkHelper.exportDropinAppToServer(server, managedBeanApp);
-            server.waitForStringInLogUsingMark("CWWKZ0001I.*Application managedBeanApp started");
-
-
-        } else {
-
-           server = LibertyServerFactory.getStartedLibertyServer("cdi12ManagedBeanTestServer");
-        }
-    }
-
-    @Test
-    public void testManagedBeanInterceptor() throws Exception {
-
-        HttpUtils.findStringInUrl(server, "/managedBeanApp",
-                                  "MyNonCDIInterceptor:AroundConstruct called injectedInt:16"
-                                                             + " MyCDIInterceptor:AroundConstruct called injectedStr:HelloYou"
-                                                             + " MyNonCDIInterceptor:PostConstruct called injectedInt:16"
-                                                             + " MyCDIInterceptor:PostConstruct called injectedStr:HelloYou"
-                                                             + " MyManagedBean called postConstruct()"
-                                                             + " MyNonCDIInterceptor:AroundInvoke called injectedInt:16"
-                                                             + " MyCDIInterceptor:AroundInvoke called injectedStr:HelloYou");
-
+        ShrinkHelper.exportDropinAppToServer(server, managedBeanApp, DeployOptions.SERVER_ONLY);
+        server.startServer();
     }
 
     @Test
     @ExpectedFFDC({ "com.ibm.websphere.ejbcontainer.EJBStoppedException" })
     public void preDestroyTest() throws Exception {
-        if (server != null) {
-            //We wont hit the pre-destroy if we don't trigger the servlet.
-            HttpUtils.findStringInUrl(server, "/managedBeanApp", "Begin output");
-            server.setMarkToEndOfLog();
-            Assert.assertTrue("Failed to restart the app. This was probably a hicup in the test environment.", server.restartDropinsApplication("managedBeanApp.war"));
-            List<String> lines = server.findStringsInLogs("PreDestory");
-            Assert.assertEquals("Unexpected number of lines: " + lines.toString(), 3, lines.size());
+        //We wont hit the pre-destroy if we don't trigger the servlet.
+        HttpUtils.findStringInUrl(server, "/managedBeanApp", "Begin output");
+        server.setMarkToEndOfLog();
+        Assert.assertTrue("Failed to restart the app. This was probably a hicup in the test environment.", server.restartDropinsApplication("managedBeanApp.war"));
+        List<String> lines = server.findStringsInLogs("PreDestory");
+        Assert.assertEquals("Unexpected number of lines: " + lines.toString(), 3, lines.size());
 
-            Pattern p = Pattern.compile("@PreDestory called (MyNonCDIInterceptor|MyCDIInterceptor|MyManagedBean)");
-            for (String line : lines) {
-                Assert.assertTrue("Unexpected line: " + line, p.matcher(line).find());
-            }
+        Pattern p = Pattern.compile("@PreDestory called (MyNonCDIInterceptor|MyCDIInterceptor|MyManagedBean)");
+        for (String line : lines) {
+            Assert.assertTrue("Unexpected line: " + line, p.matcher(line).find());
         }
     }
 
     @AfterClass
-    public static void afterClass() throws Exception {
+    public static void shutdown() throws Exception {
         if (server != null) {
             server.stopServer();
         }
