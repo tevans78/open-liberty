@@ -8,37 +8,34 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package test.multipleWar2;
 
-import static org.junit.Assert.assertEquals;
+package com.ibm.ws.cdi.ejb.apps.misc;
+
+import static org.junit.Assert.assertTrue;
 
 import javax.ejb.EJB;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.servlet.annotation.WebServlet;
 
 import org.junit.Test;
 
-import com.ibm.ws.cdi.ejb.apps.multipleWar.embeddedJar.MyEjb;
-
 import componenttest.app.FATServlet;
 
-/**
- *
- */
-@WebServlet("/")
-public class TestServlet extends FATServlet {
-    @EJB(name = "myEjbInWar2")
-    MyEjb myEjb;
-
-    @Inject
-    MyBean myBean;
-
-    /**  */
+@WebServlet("/AServlet")
+public class AServlet extends FATServlet {
     private static final long serialVersionUID = 1L;
 
+    @EJB
+    RemoteInterface test;
+
+    @Inject
+    Event<EJBEvent> anEvent;
+
     @Test
-    public void testDupEJBClassNames() throws Exception {
-        assertEquals(MyEjb.NAME, myEjb.getMyEjbName());
-        assertEquals(MyBean.NAME, myBean.getName());
+    public void testRemoteEJBsWorkWithCDI() throws Exception {
+        anEvent.fire(new EJBEvent());
+        assertTrue(test.observed());
     }
+
 }

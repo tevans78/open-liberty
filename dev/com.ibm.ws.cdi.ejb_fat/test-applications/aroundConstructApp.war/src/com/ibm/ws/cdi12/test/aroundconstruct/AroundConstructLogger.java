@@ -10,8 +10,8 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.test.aroundconstruct;
 
+import static com.ibm.ws.cdi.ejb.utils.Utils.id;
 import static com.ibm.ws.cdi12.test.aroundconstruct.AroundConstructLogger.ConstructorType.DEFAULT;
-import static com.ibm.ws.cdi12.test.utils.Utils.id;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;

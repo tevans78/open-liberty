@@ -17,11 +17,11 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.interceptor.Interceptors;
 
+import com.ibm.ws.cdi.ejb.utils.Intercepted;
 import com.ibm.ws.cdi12.test.aroundconstruct.interceptors.DirectlyIntercepted;
 import com.ibm.ws.cdi12.test.aroundconstruct.interceptors.InterceptorOneBinding;
 import com.ibm.ws.cdi12.test.aroundconstruct.interceptors.InterceptorTwoBinding;
 import com.ibm.ws.cdi12.test.aroundconstruct.interceptors.NonCdiInterceptor;
-import com.ibm.ws.cdi12.test.utils.Intercepted;
 
 @Stateful
 @RequestScoped

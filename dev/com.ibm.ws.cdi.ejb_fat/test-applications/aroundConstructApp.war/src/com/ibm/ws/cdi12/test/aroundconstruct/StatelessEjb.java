@@ -12,7 +12,7 @@ package com.ibm.ws.cdi12.test.aroundconstruct;
 
 import javax.ejb.Stateless;
 
-import com.ibm.ws.cdi12.test.utils.Intercepted;
+import com.ibm.ws.cdi.ejb.utils.Intercepted;
 
 @Stateless
 @Intercepted

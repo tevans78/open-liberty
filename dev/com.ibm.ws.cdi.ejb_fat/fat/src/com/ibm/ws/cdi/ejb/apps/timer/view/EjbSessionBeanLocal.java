@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 IBM Corporation and others.
+ * Copyright (c) 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,16 +8,19 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.ibm.ws.cdi12.test.aroundconstruct.interceptors;
+package com.ibm.ws.cdi.ejb.apps.timer.view;
 
-import javax.annotation.Priority;
-import javax.interceptor.Interceptor;
+public interface EjbSessionBeanLocal {
 
-import com.ibm.ws.cdi.ejb.utils.Intercepted;
+    String getStack();
 
-@Interceptor
-@Intercepted
-@Priority(Interceptor.Priority.APPLICATION)
-public class SubConstructInterceptor extends SuperConstructInterceptor {
+    int getSesCount();
 
+    int getReqCount();
+
+    void incCounters();
+
+    void incCountersViaTimer();
+
+    void incRequestCounter();
 }

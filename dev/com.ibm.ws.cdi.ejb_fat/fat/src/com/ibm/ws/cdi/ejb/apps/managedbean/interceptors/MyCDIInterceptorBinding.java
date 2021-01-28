@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 IBM Corporation and others.
+ * Copyright (c) 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,16 +8,22 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.ibm.ws.cdi12.test.aroundconstruct.interceptors;
+package com.ibm.ws.cdi.ejb.apps.managedbean.interceptors;
 
-import javax.annotation.Priority;
-import javax.interceptor.Interceptor;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import com.ibm.ws.cdi.ejb.utils.Intercepted;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-@Interceptor
-@Intercepted
-@Priority(Interceptor.Priority.APPLICATION)
-public class SubConstructInterceptor extends SuperConstructInterceptor {
+import javax.interceptor.InterceptorBinding;
+
+/**
+ * CDI interceptor binding
+ */
+@InterceptorBinding
+@Target({ TYPE })
+@Retention(RUNTIME)
+public @interface MyCDIInterceptorBinding {
 
 }

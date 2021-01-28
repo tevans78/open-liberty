@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2021 IBM Corporation and others.
+ * Copyright (c) 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,37 +8,25 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package test.multipleWar2;
+package com.ibm.ws.cdi.ejb.apps.injectparameters;
 
-import static org.junit.Assert.assertEquals;
-
-import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.annotation.WebServlet;
 
 import org.junit.Test;
 
-import com.ibm.ws.cdi.ejb.apps.multipleWar.embeddedJar.MyEjb;
-
 import componenttest.app.FATServlet;
 
-/**
- *
- */
-@WebServlet("/")
-public class TestServlet extends FATServlet {
-    @EJB(name = "myEjbInWar2")
-    MyEjb myEjb;
+@SuppressWarnings("serial")
+@WebServlet("/TestCdiBean")
+public class TestCdiBeanServlet extends FATServlet {
 
     @Inject
-    MyBean myBean;
-
-    /**  */
-    private static final long serialVersionUID = 1L;
+    private TestCdiBean testCdiBean;
 
     @Test
-    public void testDupEJBClassNames() throws Exception {
-        assertEquals(MyEjb.NAME, myEjb.getMyEjbName());
-        assertEquals(MyBean.NAME, myBean.getName());
+    public void testCdiBeanParameterInjection() throws Exception {
+        testCdiBean.getResult().validate();
     }
+
 }

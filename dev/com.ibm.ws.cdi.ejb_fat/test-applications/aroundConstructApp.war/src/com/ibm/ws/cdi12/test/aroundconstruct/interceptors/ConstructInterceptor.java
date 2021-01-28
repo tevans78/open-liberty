@@ -10,7 +10,7 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.test.aroundconstruct.interceptors;
 
-import static com.ibm.ws.cdi12.test.utils.Utils.id;
+import static com.ibm.ws.cdi.ejb.utils.Utils.id;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
@@ -18,10 +18,10 @@ import javax.interceptor.AroundConstruct;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 
+import com.ibm.ws.cdi.ejb.utils.Intercepted;
 import com.ibm.ws.cdi12.test.aroundconstruct.AroundConstructLogger;
 import com.ibm.ws.cdi12.test.aroundconstruct.StatelessAroundConstructLogger;
 import com.ibm.ws.cdi12.test.aroundconstruct.StatelessEjb;
-import com.ibm.ws.cdi12.test.utils.Intercepted;
 
 @Interceptor
 @Intercepted

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.test.aroundconstruct;
 
-import static com.ibm.ws.cdi12.test.utils.Utils.id;
+import static com.ibm.ws.cdi.ejb.utils.Utils.id;
 import static org.junit.Assert.assertEquals;
 
 import javax.inject.Inject;

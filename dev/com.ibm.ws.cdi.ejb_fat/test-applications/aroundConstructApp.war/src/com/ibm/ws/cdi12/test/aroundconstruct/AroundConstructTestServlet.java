@@ -10,8 +10,8 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.test.aroundconstruct;
 
+import static com.ibm.ws.cdi.ejb.utils.Utils.id;
 import static com.ibm.ws.cdi12.test.aroundconstruct.AroundConstructLogger.ConstructorType.INJECTED;
-import static com.ibm.ws.cdi12.test.utils.Utils.id;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.notNullValue;

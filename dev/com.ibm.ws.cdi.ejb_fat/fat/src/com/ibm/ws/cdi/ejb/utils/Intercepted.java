@@ -8,16 +8,20 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.ibm.ws.cdi12.test.aroundconstruct.interceptors;
+package com.ibm.ws.cdi.ejb.utils;
 
-import javax.annotation.Priority;
-import javax.interceptor.Interceptor;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import com.ibm.ws.cdi.ejb.utils.Intercepted;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-@Interceptor
-@Intercepted
-@Priority(Interceptor.Priority.APPLICATION)
-public class SubConstructInterceptor extends SuperConstructInterceptor {
+import javax.interceptor.InterceptorBinding;
+
+@InterceptorBinding
+@Target({ METHOD, TYPE })
+@Retention(RUNTIME)
+public @interface Intercepted {
 
 }

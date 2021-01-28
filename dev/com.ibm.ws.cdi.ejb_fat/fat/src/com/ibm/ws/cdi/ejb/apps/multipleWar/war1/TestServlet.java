@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package test.multipleWar2;
+package com.ibm.ws.cdi.ejb.apps.multipleWar.war1;
 
 import static org.junit.Assert.assertEquals;
 
@@ -27,9 +27,8 @@ import componenttest.app.FATServlet;
  */
 @WebServlet("/")
 public class TestServlet extends FATServlet {
-    @EJB(name = "myEjbInWar2")
+    @EJB(name = "myEjbInWar1")
     MyEjb myEjb;
-
     @Inject
     MyBean myBean;
 

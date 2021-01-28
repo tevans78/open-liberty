@@ -8,22 +8,27 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.ibm.ws.cdi12.test.aroundconstruct;
 
-import static com.ibm.ws.cdi.ejb.utils.Utils.id;
+package com.ibm.ws.cdi.ejb.apps.misc;
 
-import javax.enterprise.context.ApplicationScoped;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-@ApplicationScoped
-public class StatelessAroundConstructLogger {
+import javax.ejb.Stateful;
+import javax.enterprise.event.Observes;
 
-    private String interceptedBean;
+@Stateful
+public class TestObserver implements RemoteInterface {
 
-    public void setInterceptedBean(final Class<?> interceptor) {
-        interceptedBean = id(interceptor);
+    static AtomicBoolean observed = new AtomicBoolean(false);
+
+    @Override
+    public void observeRemote(@Observes EJBEvent e) {
+        observed.set(true);
     }
 
-    public String getInterceptedBean() {
-        return interceptedBean;
+    @Override
+    public boolean observed() {
+        return observed.get();
     }
+
 }

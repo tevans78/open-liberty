@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 IBM Corporation and others.
+ * Copyright (c) 2015, 2021 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,16 +8,21 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.ibm.ws.cdi12.test.aroundconstruct.interceptors;
+package com.ibm.ws.cdi.ejb.apps.multipleWar.war1;
 
-import javax.annotation.Priority;
-import javax.interceptor.Interceptor;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 
-import com.ibm.ws.cdi.ejb.utils.Intercepted;
+/**
+ *
+ */
+@Named("mySameBean")
+@ApplicationScoped
+public class MyBean {
 
-@Interceptor
-@Intercepted
-@Priority(Interceptor.Priority.APPLICATION)
-public class SubConstructInterceptor extends SuperConstructInterceptor {
+    public static final String NAME = "myWar1Bean";
 
+    public String getName() {
+        return NAME;
+    }
 }

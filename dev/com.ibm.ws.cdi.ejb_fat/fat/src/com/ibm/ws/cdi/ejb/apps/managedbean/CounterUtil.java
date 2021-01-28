@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 IBM Corporation and others.
+ * Copyright (c) 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,16 +8,24 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.ibm.ws.cdi12.test.aroundconstruct.interceptors;
+package com.ibm.ws.cdi.ejb.apps.managedbean;
 
-import javax.annotation.Priority;
-import javax.interceptor.Interceptor;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.ibm.ws.cdi.ejb.utils.Intercepted;
+/**
+ *
+ */
+public class CounterUtil {
 
-@Interceptor
-@Intercepted
-@Priority(Interceptor.Priority.APPLICATION)
-public class SubConstructInterceptor extends SuperConstructInterceptor {
+    private static List<String> msgList = new ArrayList<String>();
+
+    public static void addToMsgList(String str) {
+        msgList.add(str);
+    }
+
+    public static List<String> getMsgList() {
+        return msgList;
+    }
 
 }

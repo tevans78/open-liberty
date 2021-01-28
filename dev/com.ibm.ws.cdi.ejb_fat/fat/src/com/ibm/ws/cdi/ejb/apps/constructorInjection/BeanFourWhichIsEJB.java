@@ -1,5 +1,7 @@
+package com.ibm.ws.cdi.ejb.apps.constructorInjection;
+
 /*******************************************************************************
- * Copyright (c) 2014 IBM Corporation and others.
+ * Copyright (c) 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,16 +10,23 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.ibm.ws.cdi12.test.aroundconstruct.interceptors;
 
-import javax.annotation.Priority;
-import javax.interceptor.Interceptor;
+import javax.ejb.LocalBean;
+import javax.ejb.Stateless;
 
-import com.ibm.ws.cdi.ejb.utils.Intercepted;
+/**
+ *
+ */
+@Stateless
+@LocalBean
+@MyForthQualifier
+public class BeanFourWhichIsEJB implements Iface {
 
-@Interceptor
-@Intercepted
-@Priority(Interceptor.Priority.APPLICATION)
-public class SubConstructInterceptor extends SuperConstructInterceptor {
+    private final String msg = "eggs";
+
+    @Override
+    public String getMsg() {
+        return msg;
+    }
 
 }
