@@ -39,7 +39,6 @@ import componenttest.rules.repeater.EERepeatTests;
 import componenttest.rules.repeater.RepeatTests;
 import componenttest.topology.impl.LibertyServer;
 import componenttest.topology.utils.FATServletClient;
-import componenttest.topology.utils.HttpUtils;
 
 @RunWith(FATRunner.class)
 public class CDIManagedBeanInterceptorTest extends FATServletClient {
@@ -79,7 +78,7 @@ public class CDIManagedBeanInterceptorTest extends FATServletClient {
     @ExpectedFFDC({ "com.ibm.websphere.ejbcontainer.EJBStoppedException" })
     public void preDestroyTest() throws Exception {
         //We wont hit the pre-destroy if we don't trigger the servlet.
-        HttpUtils.findStringInUrl(server, "/managedBeanApp", "Begin output");
+        runTest(server, MANAGED_BEAN_APP_NAME, "testManagedBeanInterceptor");
         server.setMarkToEndOfLog();
         Assert.assertTrue("Failed to restart the app. This was probably a hicup in the test environment.", server.restartDropinsApplication("managedBeanApp.war"));
         List<String> lines = server.findStringsInLogs("PreDestory");

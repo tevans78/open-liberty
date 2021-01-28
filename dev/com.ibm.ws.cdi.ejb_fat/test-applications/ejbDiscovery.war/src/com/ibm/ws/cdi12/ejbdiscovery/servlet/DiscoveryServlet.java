@@ -10,9 +10,7 @@
  *******************************************************************************/
 package com.ibm.ws.cdi12.ejbdiscovery.servlet;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Type;
 import java.util.Set;
@@ -33,70 +31,72 @@ public class DiscoveryServlet extends FATServlet {
     @Inject
     private DiscoveryExtension extension;
 
-    @SuppressWarnings("unchecked")
+    private static void assertContains(Set<?> set, Object contains) {
+        assertTrue(contains + " not found in " + set, set.contains(contains));
+    }
+
+    private static void assertNotContains(Set<?> set, Object contains) {
+        assertTrue(contains + " found in " + set, !set.contains(contains));
+    }
+
     @Test
     public void testAnnotatedTypesDiscovered() throws Exception {
         Set<Class<?>> types = extension.getObservedTypes();
-        assertThat(types, contains(com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonBean.class,
-                                   com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulBean.class,
-                                   com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessBean.class));
+        assertContains(types, com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonBean.class);
+        assertContains(types, com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulBean.class);
+        assertContains(types, com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessBean.class);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testDeploymentDescriptorTypesDiscovered() throws Exception {
         Set<Class<?>> types = extension.getObservedTypes();
-        assertThat(types, contains(com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonDdBean.class,
-                                   com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulDdBean.class,
-                                   com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessDdBean.class));
+        assertContains(types, com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonDdBean.class);
+        assertContains(types, com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulDdBean.class);
+        assertContains(types, com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessDdBean.class);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testAnnotatedBeansDiscovered() throws Exception {
         Set<Class<?>> beans = extension.getObservedBeans();
-        assertThat(beans, contains(com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonBean.class,
-                                   com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulBean.class,
-                                   com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessBean.class));
+        assertContains(beans, com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonBean.class);
+        assertContains(beans, com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulBean.class);
+        assertContains(beans, com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessBean.class);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testDeploymentDescriptorBeansDiscovered() throws Exception {
         Set<Class<?>> beans = extension.getObservedBeans();
-        assertThat(beans, contains(com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonDdBean.class,
-                                   com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulDdBean.class,
-                                   com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessDdBean.class));
+        assertContains(beans, com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonDdBean.class);
+        assertContains(beans, com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulDdBean.class);
+        assertContains(beans, com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessDdBean.class);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testNoInterfaceTypesDiscovered() throws Exception {
         Set<Class<?>> beans = extension.getObservedBeans();
-        assertThat(beans, contains(com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonBean.class,
-                                   com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulBean.class,
-                                   com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonDdBean.class,
-                                   com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulDdBean.class));
+        assertContains(beans, com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonBean.class);
+        assertContains(beans, com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulBean.class);
+        assertContains(beans, com.ibm.ws.cdi12.ejbdiscovery.ejbs.SingletonDdBean.class);
+        assertContains(beans, com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatefulDdBean.class);
     }
 
     @Test
     public void testInterfaceTypesDiscovered() throws Exception {
         Set<Type> beanTypes = extension.getObservedBeanTypes();
         // The two stateless beans have a local interface defined
-        assertThat(beanTypes, contains(com.ibm.ws.cdi12.ejbdiscovery.ejbs.interfaces.StatelessLocal.class,
-                                       com.ibm.ws.cdi12.ejbdiscovery.ejbs.interfaces.StatelessDdLocal.class));
+        assertContains(beanTypes, com.ibm.ws.cdi12.ejbdiscovery.ejbs.interfaces.StatelessLocal.class);
+        assertContains(beanTypes, com.ibm.ws.cdi12.ejbdiscovery.ejbs.interfaces.StatelessDdLocal.class);
 
         // The actual bean type should not be visible
-        assertThat(beanTypes, not(contains(com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessBean.class)));
-        assertThat(beanTypes, not(contains(com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessDdBean.class)));
+        assertNotContains(beanTypes, com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessBean.class);
+        assertNotContains(beanTypes, com.ibm.ws.cdi12.ejbdiscovery.ejbs.StatelessDdBean.class);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testModeNoneNotDiscovered() throws Exception {
         Set<Class<?>> beans = extension.getObservedBeans();
         // There is a stateless bean that should not be discovered because the .jar has discovery-mode=none
-        assertThat(beans, not(contains(com.ibm.ws.cdi12.ejbdiscovery.none.StatelessBean.class)));
+        assertNotContains(beans, com.ibm.ws.cdi12.ejbdiscovery.none.UndiscoveredStatelessBean.class);
     }
 
 }

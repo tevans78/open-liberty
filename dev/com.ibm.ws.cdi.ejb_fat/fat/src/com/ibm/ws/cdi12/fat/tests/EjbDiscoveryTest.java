@@ -11,6 +11,7 @@
 package com.ibm.ws.cdi12.fat.tests;
 
 import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE7_FULL;
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE8_FULL;
 import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE9;
 
 import java.io.File;
@@ -45,9 +46,9 @@ public class EjbDiscoveryTest extends FATServletClient {
     public static final String SERVER_NAME = "cdi12EjbDiscoveryServer";
     public static final String EJB_DISCOVERY_APP_NAME = "ejbDiscovery";
 
-    //not bothering to repeat with EE8 ... the EE9 version is mostly a transformed version of the EE8 code
+    //chosen this one test to run on EE8 as well
     @ClassRule
-    public static RepeatTests r = EERepeatTests.with(SERVER_NAME, EE9, EE7_FULL);
+    public static RepeatTests r = EERepeatTests.with(SERVER_NAME, EE9, EE8_FULL, EE7_FULL);
 
     @Server(SERVER_NAME)
     @TestServlets({
@@ -59,7 +60,7 @@ public class EjbDiscoveryTest extends FATServletClient {
     public static void setUp() throws Exception {
         JavaArchive ejbDiscoveryNone = ShrinkWrap.create(JavaArchive.class,
                                                          EJB_DISCOVERY_APP_NAME + "None.jar")
-                                                 .addClass(com.ibm.ws.cdi12.ejbdiscovery.none.StatelessBean.class)
+                                                 .addClass(com.ibm.ws.cdi12.ejbdiscovery.none.UndiscoveredStatelessBean.class)
                                                  .addClass(com.ibm.ws.cdi12.ejbdiscovery.none.StatelessLocal.class)
                                                  .add(new FileAsset(new File("test-applications/" + EJB_DISCOVERY_APP_NAME + "None.jar/resources/WEB-INF/beans.xml")),
                                                       "/META-INF/beans.xml");
