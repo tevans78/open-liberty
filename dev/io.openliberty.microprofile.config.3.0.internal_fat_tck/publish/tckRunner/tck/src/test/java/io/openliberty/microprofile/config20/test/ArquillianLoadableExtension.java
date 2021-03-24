@@ -8,9 +8,17 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
+package io.openliberty.microprofile.config20.test;
 
-dependencies {
-  requiredLibs 'commons-logging:commons-logging:1.1.3'
-  requiredLibs project(path: ':io.openliberty.org.eclipse.microprofile', configuration: 'config20')
+import java.util.EnumSet;
+import java.util.Set;
+
+import com.ibm.ws.fat.util.tck.AbstractArquillianLoadableExtension;
+import com.ibm.ws.fat.util.tck.TCKArchiveModifications;
+
+public class ArquillianLoadableExtension extends AbstractArquillianLoadableExtension {
+    @Override
+    public Set<TCKArchiveModifications> getModifications() {
+        return EnumSet.of(TCKArchiveModifications.TEST_LOGGER, TCKArchiveModifications.HAMCREST);
+    }
 }
-addRequiredLibraries.dependsOn addJakartaTransformer

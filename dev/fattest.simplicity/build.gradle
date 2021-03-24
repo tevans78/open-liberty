@@ -44,10 +44,25 @@ jar {
 
 configurations {
     arquillianFeature
+    arquillianFeatureJakarta
 }
 
 dependencies {
     arquillianFeature 'io.openliberty.arquillian:arquillian-liberty-support:1.0.5:feature@zip'
+    arquillianFeatureJakarta 'io.openliberty.arquillian:arquillian-liberty-support-jakarta:2.0.0-M1:feature@zip'
+}
+
+task extractArquillianSupportFeatureJakarta(type:Sync) {
+    configurations.arquillianFeatureJakarta.each {
+        from(zipTree(it))
+    }
+    into('build/arquillian-feature-jakarta-extract')
+    
+    doLast {
+        // Update the feature manifest to mark it as a test feature
+        file('build/arquillian-feature-jakarta-extract/extension/lib/features/arquillian-liberty-support.mf')
+            .append('IBM-Test-Feature: true\n')
+    }
 }
 
 task extractArquillianSupportFeature(type:Sync) {
@@ -69,4 +84,12 @@ task publishArquillianSupportFeature(type:Copy) {
     into(buildImage.file('wlp'))
 }
 
+task publishArquillianSupportFeatureJakarta(type:Copy) {
+    dependsOn extractArquillianSupportFeatureJakarta
+    from('build/arquillian-feature-jakarta-extract/extension')
+    into(buildImage.file('wlp'))
+    rename ('arquillian-liberty-support.mf','arquillian-liberty-support-jakarta.mf')
+}
+
 assemble.dependsOn publishArquillianSupportFeature
+assemble.dependsOn publishArquillianSupportFeatureJakarta

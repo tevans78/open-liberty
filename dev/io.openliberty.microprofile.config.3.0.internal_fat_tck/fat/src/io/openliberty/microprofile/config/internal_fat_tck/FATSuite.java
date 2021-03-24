@@ -8,9 +8,20 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
+package io.openliberty.microprofile.config.internal_fat_tck;
 
-dependencies {
-  requiredLibs 'commons-logging:commons-logging:1.1.3'
-  requiredLibs project(path: ':io.openliberty.org.eclipse.microprofile', configuration: 'config20')
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+
+import componenttest.custom.junit.runner.AlwaysPassesTest;
+
+@RunWith(Suite.class)
+@SuiteClasses({
+                AlwaysPassesTest.class, //LITE
+                Config20TCKLauncher.class //LITE
+})
+
+public class FATSuite {
+
 }
-addRequiredLibraries.dependsOn addJakartaTransformer

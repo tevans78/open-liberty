@@ -6,11 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementation
+ * IBM Corporation - initial API and implementation
  *******************************************************************************/
-
-dependencies {
-  requiredLibs 'commons-logging:commons-logging:1.1.3'
-  requiredLibs project(path: ':io.openliberty.org.eclipse.microprofile', configuration: 'config20')
-}
-addRequiredLibraries.dependsOn addJakartaTransformer
+@com.ibm.websphere.ras.annotation.TraceOptions(traceGroup = "APPCONFIG")
+package io.openliberty.microprofile.config.internal.extension;

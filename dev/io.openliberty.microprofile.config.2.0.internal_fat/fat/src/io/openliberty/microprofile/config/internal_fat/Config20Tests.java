@@ -58,6 +58,7 @@ public class Config20Tests extends FATServletClient {
 
     @ClassRule
     public static RepeatTests r = MicroProfileActions.repeat(SERVER_NAME, MicroProfileActions.LATEST);
+    //.andWith(new JakartaEE9Action().addFeature("mpConfig-3.0").removeFeature("mpConfig-2.0").forServers(SERVER_NAME));
 
     @Server(SERVER_NAME)
     @TestServlets({
