@@ -36,7 +36,6 @@ import componenttest.topology.impl.LibertyServer;
 import componenttest.topology.utils.FATServletClient;
 
 @RunWith(FATRunner.class)
-//@Mode(TestMode.FULL)
 public class AfterTypeDiscoveryTest extends FATServletClient {
 
     public static final String SERVER_NAME = "cdi12AfterTypeDiscoveryServer";

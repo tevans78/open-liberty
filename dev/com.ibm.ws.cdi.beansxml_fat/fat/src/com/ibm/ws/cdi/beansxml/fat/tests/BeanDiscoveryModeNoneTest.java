@@ -10,10 +10,14 @@
  *******************************************************************************/
 package com.ibm.ws.cdi.beansxml.fat.tests;
 
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE7_FULL;
+import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE9;
+
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -27,14 +31,21 @@ import com.ibm.ws.cdi.beansxml.fat.apps.beanDiscoveryModeNone.TestBean1;
 import componenttest.annotation.ExpectedFFDC;
 import componenttest.annotation.Server;
 import componenttest.custom.junit.runner.FATRunner;
+import componenttest.rules.repeater.EERepeatTests;
+import componenttest.rules.repeater.RepeatTests;
 import componenttest.topology.impl.LibertyServer;
 import componenttest.topology.utils.HttpRequest;
 
 @RunWith(FATRunner.class)
 public class BeanDiscoveryModeNoneTest {
 
-    @Server("cdi12BeanDiscoveryModeNoneServer")
+    public static final String SERVER_NAME = "cdi12BeanDiscoveryModeNoneServer";
+
+    @Server(SERVER_NAME)
     public static LibertyServer server;
+
+    @ClassRule
+    public static RepeatTests r = EERepeatTests.with(SERVER_NAME, EE9, EE7_FULL); //not bothering to repeat with EE8 ... the EE9 version is mostly a transformed version of the EE8 code
 
     @BeforeClass
     public static void setUp() throws Exception {
