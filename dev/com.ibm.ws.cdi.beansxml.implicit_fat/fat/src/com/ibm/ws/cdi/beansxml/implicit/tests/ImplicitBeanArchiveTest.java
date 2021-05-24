@@ -13,10 +13,7 @@ package com.ibm.ws.cdi.beansxml.implicit.tests;
 import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE7_FULL;
 import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE9;
 
-import java.io.File;
-
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.FileAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.AfterClass;
@@ -24,8 +21,12 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
 
+import com.ibm.websphere.simplicity.CDIArchiveHelper;
 import com.ibm.websphere.simplicity.ShrinkHelper;
 import com.ibm.websphere.simplicity.ShrinkHelper.DeployOptions;
+import com.ibm.websphere.simplicity.beansxml.BeansAsset.DiscoveryMode;
+import com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchive.unannotated.UnannotatedClassInAllModeBeanArchive;
+import com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchive.unannotated.UnannotatedClassInAnnotatedModeBeanArchive;
 
 import componenttest.annotation.Server;
 import componenttest.annotation.TestServlet;
@@ -52,51 +53,54 @@ public class ImplicitBeanArchiveTest extends FATServletClient {
 
     @Server(SERVER_NAME)
     @TestServlets({
-                    @TestServlet(servlet = com.ibm.ws.cdi.beansxml.implicit.apps.servlets.ImplicitBeanArchiveServlet.class, contextRoot = IMPLICIT_BEAN_ARCHIVE_APP_NAME) //LITE
+                    @TestServlet(servlet = com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchive.ImplicitBeanArchiveServlet.class, contextRoot = IMPLICIT_BEAN_ARCHIVE_APP_NAME) //LITE
     })
     public static LibertyServer server;
 
     @BeforeClass
     public static void buildShrinkWrap() throws Exception {
 
+        //empty beans.xml
         JavaArchive archiveWithBeansXML = ShrinkWrap.create(JavaArchive.class, "archiveWithBeansXML.jar")
-                                                    .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.unannotated.UnannotatedBeanInAllModeBeanArchive.class)
-                                                    .add(new FileAsset(new File("test-applications/archiveWithBeansXML.jar/resources/META-INF/beans.xml")), "/META-INF/beans.xml");
+                                                    .addClass(UnannotatedClassInAllModeBeanArchive.class);
+        CDIArchiveHelper.addEmptyBeansXML(archiveWithBeansXML);
 
+        //bean discovery mode = none
         JavaArchive archiveWithNoScanBeansXML = ShrinkWrap.create(JavaArchive.class, "archiveWithNoScanBeansXML.jar")
-                                                          .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.beans.RequestScopedButNoScan.class)
-                                                          .add(new FileAsset(new File("test-applications/archiveWithNoScanBeansXML.jar/resources/META-INF/beans.xml")),
-                                                               "/META-INF/beans.xml");
+                                                          .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchive.beans.RequestScopedButNoScan.class);
+        CDIArchiveHelper.addBeansXML(archiveWithNoScanBeansXML, DiscoveryMode.NONE);
 
+        //no beans, no beans.xml
         JavaArchive archiveWithNoImplicitBeans = ShrinkWrap.create(JavaArchive.class, "archiveWithNoImplicitBeans.jar")
-                                                           .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.unannotated.ClassWithInjectButNotABean.class);
+                                                           .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchive.unannotated.UnannotatedClassWithInject.class);
 
+        //lots of annotated beans, no beans.xml
         JavaArchive archiveWithImplicitBeans = ShrinkWrap.create(JavaArchive.class, "archiveWithImplicitBeans.jar")
-                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.beans.StereotypedBean.class)
-                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.beans.MyExtendedScopedBean.class)
-                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.beans.MyStereotype.class)
-                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.beans.SessionScopedBean.class)
-                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.beans.ConversationScopedBean.class)
-                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.unannotated.UnannotatedBeanInImplicitBeanArchive.class)
-                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.beans.MyExtendedNormalScoped.class)
-                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.beans.RequestScopedBean.class)
-                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.beans.ApplicationScopedBean.class);
+                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchive.annotations.MyStereotype.class)
+                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchive.annotations.MyExtendedNormalScoped.class)
+                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchive.unannotated.UnannotatedClassInImplicitBeanArchive.class)
+                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchive.beans.StereotypedBean.class)
+                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchive.beans.MyExtendedScopedBean.class)
+                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchive.beans.SessionScopedBean.class)
+                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchive.beans.ConversationScopedBean.class)
+                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchive.beans.RequestScopedBean.class)
+                                                         .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchive.beans.ApplicationScopedBean.class);
 
+        //annotated beans, beans.xml with discovery mode = annotated
         JavaArchive archiveWithAnnotatedModeBeansXML = ShrinkWrap.create(JavaArchive.class, "archiveWithAnnotatedModeBeansXML.jar")
-                                                                 .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.beans.DependentScopedBean.class)
-                                                                 .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.unannotated.UnannotatedClassInAnnotatedModeBeanArchive.class)
-                                                                 .add(new FileAsset(new File("test-applications/archiveWithAnnotatedModeBeansXML.jar/resources/META-INF/beans.xml")),
-                                                                      "/META-INF/beans.xml");
+                                                                 .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchive.beans.DependentScopedBean.class)
+                                                                 .addClass(UnannotatedClassInAnnotatedModeBeanArchive.class);
+        CDIArchiveHelper.addBeansXML(archiveWithAnnotatedModeBeansXML, DiscoveryMode.ANNOTATED);
 
+        //empty beans.xml
         WebArchive implicitBeanArchive = ShrinkWrap.create(WebArchive.class, IMPLICIT_BEAN_ARCHIVE_APP_NAME + ".war")
-                                                   .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.servlets.ImplicitBeanArchiveServlet.class)
-                                                   .add(new FileAsset(new File("test-applications/" + IMPLICIT_BEAN_ARCHIVE_APP_NAME + ".war/resources/WEB-INF/beans.xml")),
-                                                        "/WEB-INF/beans.xml")
+                                                   .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchive.ImplicitBeanArchiveServlet.class)
                                                    .addAsLibrary(archiveWithBeansXML)
                                                    .addAsLibrary(archiveWithImplicitBeans)
                                                    .addAsLibrary(archiveWithNoImplicitBeans)
                                                    .addAsLibrary(archiveWithNoScanBeansXML)
                                                    .addAsLibrary(archiveWithAnnotatedModeBeansXML);
+        CDIArchiveHelper.addEmptyBeansXML(implicitBeanArchive);
 
         ShrinkHelper.exportDropinAppToServer(server, implicitBeanArchive, DeployOptions.SERVER_ONLY);
         server.startServer();

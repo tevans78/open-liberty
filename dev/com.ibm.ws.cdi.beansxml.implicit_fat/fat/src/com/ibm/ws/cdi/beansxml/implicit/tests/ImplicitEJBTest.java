@@ -13,10 +13,7 @@ package com.ibm.ws.cdi.beansxml.implicit.tests;
 import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE7_FULL;
 import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE9;
 
-import java.io.File;
-
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.FileAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.AfterClass;
@@ -24,6 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
 
+import com.ibm.websphere.simplicity.CDIArchiveHelper;
 import com.ibm.websphere.simplicity.ShrinkHelper;
 import com.ibm.websphere.simplicity.ShrinkHelper.DeployOptions;
 
@@ -55,20 +53,21 @@ public class ImplicitEJBTest extends FATServletClient {
 
     @Server(SERVER_NAME)
     @TestServlets({
-                    @TestServlet(servlet = com.ibm.ws.cdi.beansxml.implicit.apps.servlets.ImplicitEJBServlet.class, contextRoot = IMPLICIT_EJB_IN_WAR_APP_NAME) //FULL
+                    @TestServlet(servlet = com.ibm.ws.cdi.beansxml.implicit.apps.implicitEJBInWar.ImplicitEJBServlet.class, contextRoot = IMPLICIT_EJB_IN_WAR_APP_NAME) //FULL
     })
     public static LibertyServer server;
 
     @BeforeClass
     public static void buildShrinkWrap() throws Exception {
 
+        //empty beans.xml
         JavaArchive utilLib = ShrinkWrap.create(JavaArchive.class, "utilLib.jar")
-                                        .addClass(com.ibm.ws.cdi.beansxml.implicit.utils.SimpleAbstract.class)
-                                        .add(new FileAsset(new File("test-applications/utilLib.jar/resources/META-INF/beans.xml")), "/META-INF/beans.xml");
+                                        .addClass(com.ibm.ws.cdi.beansxml.implicit.utils.SimpleAbstract.class);
+        CDIArchiveHelper.addEmptyBeansXML(utilLib);
 
         WebArchive implicitEJBInWar = ShrinkWrap.create(WebArchive.class, IMPLICIT_EJB_IN_WAR_APP_NAME + ".war")
-                                                .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.servlets.ImplicitEJBServlet.class)
-                                                .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.ejb.SimpleEJB.class)
+                                                .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.implicitEJBInWar.ImplicitEJBServlet.class)
+                                                .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.implicitEJBInWar.SimpleEJB.class)
                                                 .addAsLibrary(utilLib);
 
         ShrinkHelper.exportDropinAppToServer(server, implicitEJBInWar, DeployOptions.SERVER_ONLY);

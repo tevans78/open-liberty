@@ -13,10 +13,7 @@ package com.ibm.ws.cdi.beansxml.implicit.tests;
 import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE7_FULL;
 import static componenttest.rules.repeater.EERepeatTests.EEVersion.EE9;
 
-import java.io.File;
-
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.FileAsset;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -25,8 +22,14 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
 
+import com.ibm.websphere.simplicity.CDIArchiveHelper;
 import com.ibm.websphere.simplicity.ShrinkHelper;
 import com.ibm.websphere.simplicity.ShrinkHelper.DeployOptions;
+import com.ibm.websphere.simplicity.beansxml.BeansAsset.DiscoveryMode;
+import com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchiveDisabled.MyBike;
+import com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchiveDisabled.MyCar;
+import com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchiveDisabled.ImplicitBeanArchiveDisabledServlet;
+import com.ibm.ws.cdi.beansxml.implicit.apps.implicitBeanArchiveDisabled.MyPlane;
 
 import componenttest.annotation.Server;
 import componenttest.annotation.TestServlet;
@@ -50,7 +53,7 @@ public class ImplicitBeanArchivesDisabledTest extends FATServletClient {
 
     @Server(SERVER_NAME)
     @TestServlets({
-                    @TestServlet(servlet = com.ibm.ws.cdi.beansxml.implicit.apps.servlets.MyCarServlet.class, contextRoot = IMPLICIT_BEAN_ARCHIVE_DISABLED_APP_NAME) }) //LITE
+                    @TestServlet(servlet = ImplicitBeanArchiveDisabledServlet.class, contextRoot = IMPLICIT_BEAN_ARCHIVE_DISABLED_APP_NAME) }) //LITE
     public static LibertyServer server;
 
     @BeforeClass
@@ -59,26 +62,22 @@ public class ImplicitBeanArchivesDisabledTest extends FATServletClient {
         //implicit bean archives are disabled in the server.xml
         //this jar does not have a beans.xml so MyPlane should not be found as a Bean
         JavaArchive implicitBeanArchiveDisabledJar = ShrinkWrap.create(JavaArchive.class, IMPLICIT_BEAN_ARCHIVE_DISABLED_APP_NAME + ".jar")
-                                                               .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.beans.MyPlane.class);
+                                                               .addClass(MyPlane.class);
 
         //this war does have a beans.xml with mode=annotated so MyCar will be found as a Bean
         WebArchive implicitBeanArchiveDisabled = ShrinkWrap.create(WebArchive.class, IMPLICIT_BEAN_ARCHIVE_DISABLED_APP_NAME + ".war")
-                                                           .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.beans.MyCar.class)
-                                                           .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.servlets.MyCarServlet.class)
-                                                           .add(new FileAsset(new File("test-applications/" + IMPLICIT_BEAN_ARCHIVE_DISABLED_APP_NAME
-                                                                                       + ".war/resources/WEB-INF/beans.xml")),
-                                                                "/WEB-INF/beans.xml")
+                                                           .addClass(MyCar.class)
+                                                           .addClass(ImplicitBeanArchiveDisabledServlet.class)
                                                            .addAsLibrary(implicitBeanArchiveDisabledJar);
+        CDIArchiveHelper.addBeansXML(implicitBeanArchiveDisabled, DiscoveryMode.ANNOTATED);
 
         //this jar does have a empty beans.xml so MyBike will be found as a Bean
         JavaArchive explicitBeanArchive = ShrinkWrap.create(JavaArchive.class, "explicitBeanArchive.jar")
-                                                    .addClass(com.ibm.ws.cdi.beansxml.implicit.apps.beans.MyBike.class)
-                                                    .add(new FileAsset(new File("test-applications/explicitBeanArchive.jar/resources/META-INF/beans.xml")), "/META-INF/beans.xml");
+                                                    .addClass(MyBike.class);
+        CDIArchiveHelper.addEmptyBeansXML(explicitBeanArchive);
 
         EnterpriseArchive implicitBeanArchiveDisabledEar = ShrinkWrap.create(EnterpriseArchive.class, IMPLICIT_BEAN_ARCHIVE_DISABLED_APP_NAME + ".ear")
-                                                                     .add(new FileAsset(new File("test-applications/" + IMPLICIT_BEAN_ARCHIVE_DISABLED_APP_NAME
-                                                                                                 + ".ear/resources/META-INF/application.xml")),
-                                                                          "/META-INF/application.xml")
+                                                                     .setApplicationXML(ImplicitBeanArchiveDisabledServlet.class.getPackage(), "application.xml")
                                                                      .addAsLibrary(explicitBeanArchive)
                                                                      .addAsModule(implicitBeanArchiveDisabled);
 
