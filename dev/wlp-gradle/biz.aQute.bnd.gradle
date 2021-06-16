@@ -60,6 +60,9 @@ subprojects {
               token = gradle.userProps.getProperty("ossindexToken") 
         }
       }
+      
+      // Apply Spotbugs plugin.   
+      apply plugin: 'com.github.spotbugs'
     }
 
   } else {
