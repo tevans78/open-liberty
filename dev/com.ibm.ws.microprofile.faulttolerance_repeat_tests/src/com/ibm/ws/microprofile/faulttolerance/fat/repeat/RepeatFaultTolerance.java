@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import componenttest.custom.junit.runner.Mode.TestMode;
-import componenttest.rules.repeater.FeatureReplacementAction;
+import componenttest.rules.repeater.AbstractReplacementAction;
 import componenttest.rules.repeater.FeatureSet;
 import componenttest.rules.repeater.MicroProfileActions;
 import componenttest.rules.repeater.RepeatTests;
@@ -67,7 +67,7 @@ public class RepeatFaultTolerance {
      * @param server The server to repeat on
      * @return the new action
      */
-    public static FeatureReplacementAction ft11metrics20Features(String server) {
+    public static AbstractReplacementAction<?> ft11metrics20Features(String server) {
         return MicroProfileActions.forFeatureSet(ALL, MP21_METRICS20, server, TestMode.LITE);
     }
 

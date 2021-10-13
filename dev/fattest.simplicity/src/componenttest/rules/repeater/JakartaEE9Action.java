@@ -15,7 +15,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -32,7 +31,6 @@ import com.ibm.websphere.simplicity.ShrinkHelper;
 import com.ibm.websphere.simplicity.log.Log;
 import com.ibm.ws.fat.util.SharedServer;
 
-import componenttest.custom.junit.runner.Mode.TestMode;
 import componenttest.custom.junit.runner.RepeatTestFilter;
 import componenttest.topology.impl.LibertyServer;
 import componenttest.topology.impl.LibertyServerFactory;
@@ -45,15 +43,15 @@ import componenttest.topology.utils.FileUtils;
  * <li>Update all server.xml configs under the autoFVT/publish/ folder to use EE 9 features</li>
  * </ol>
  */
-public class JakartaEE9Action extends FeatureReplacementAction {
+public class JakartaEE9Action extends AbstractReplacementAction<JakartaEE9Action> {
     private static final Class<?> c = JakartaEE9Action.class;
 
     public static final String ID = "EE9_FEATURES";
 
     private static final String TRANSFORMER_RULES_APPEND_ROOT = System.getProperty("user.dir") + "/publish/rules/";
     private static final String TRANSFORMER_RULES_ROOT = System.getProperty("user.dir") + "/autoFVT-templates/";
-    private static final Map<String, String> DEFAULT_TRANSFORMATION_RULES = new HashMap();
-    private static final Map<String, String> TRANSFORMATION_RULES_APPEND = new HashMap();
+    private static final Map<String, String> DEFAULT_TRANSFORMATION_RULES = new HashMap<String, String>();
+    private static final Map<String, String> TRANSFORMATION_RULES_APPEND = new HashMap<String, String>();
 
     static {
         // Fill the default transformation rules for the transformer
@@ -145,63 +143,6 @@ public class JakartaEE9Action extends FeatureReplacementAction {
         return "JakartaEE9 FAT repeat action (" + getID() + ")";
     }
 
-    //
-
-    @Override
-    public JakartaEE9Action addFeature(String addFeature) {
-        return (JakartaEE9Action) super.addFeature(addFeature);
-    }
-
-    @Override
-    public JakartaEE9Action fullFATOnly() {
-        return (JakartaEE9Action) super.fullFATOnly();
-    }
-
-    @Override
-    public JakartaEE9Action liteFATOnly() {
-        return (JakartaEE9Action) super.liteFATOnly();
-    }
-
-    @Override
-    public JakartaEE9Action withTestMode(TestMode mode) {
-        return (JakartaEE9Action) super.withTestMode(mode);
-    }
-
-    @Override
-    public JakartaEE9Action addFeatures(Set<String> addFeatures) {
-        return (JakartaEE9Action) super.addFeatures(addFeatures);
-    }
-
-    @Override
-    public JakartaEE9Action removeFeature(String removeFeature) {
-        return (JakartaEE9Action) super.removeFeature(removeFeature);
-    }
-
-    @Override
-    public JakartaEE9Action removeFeatures(Set<String> removeFeatures) {
-        return (JakartaEE9Action) super.removeFeatures(removeFeatures);
-    }
-
-    @Override
-    public JakartaEE9Action withMinJavaLevel(int javaLevel) {
-        return (JakartaEE9Action) super.withMinJavaLevel(javaLevel);
-    }
-
-    @Override
-    public JakartaEE9Action withID(String id) {
-        return (JakartaEE9Action) super.withID(id);
-    }
-
-    @Override
-    public JakartaEE9Action forServers(String... serverNames) {
-        return (JakartaEE9Action) super.forServers(serverNames);
-    }
-
-    @Override
-    public JakartaEE9Action forClients(String... clientNames) {
-        return (JakartaEE9Action) super.forClients(clientNames);
-    }
-
     /**
      * Specifies which file in the rules directory of the FAT will be used for
      * adding additional package transformations.
@@ -278,6 +219,13 @@ public class JakartaEE9Action extends FeatureReplacementAction {
 
     @Override
     public void setup() throws Exception {
+        clean();
+
+        // Transform server.xml's
+        super.setup();
+    }
+
+    static void clean() throws Exception {
         // Ensure all shared servers are stopped and applications are cleaned
         LibertyServerFactory.tidyAllKnownServers(SharedServer.class.getCanonicalName());
         LibertyServerFactory.recoverAllServers(SharedServer.class.getCanonicalName());
@@ -286,9 +234,6 @@ public class JakartaEE9Action extends FeatureReplacementAction {
             FileUtils.recursiveDelete(rootPath.toFile());
         }
         ShrinkHelper.cleanAllExportedArchives();
-
-        // Transform server.xml's
-        super.setup();
     }
 
     public static boolean isActive() {
@@ -335,142 +280,284 @@ public class JakartaEE9Action extends FeatureReplacementAction {
      */
     public static void transformApp(Path appPath, Path newAppPath) {
         final String m = "transformApp";
+        appPath = appPath.toAbsolutePath();
         Log.info(c, m, "Transforming app: " + appPath);
 
         // Setup file output stream and only keep if we fail
         FileOutputStream fos = null;
-        File outputLog = new File("results/transformer_" + appPath.getFileName() + ".log");
+        File outputLog = getTransformerLogFile(appPath);
         try {
             fos = new FileOutputStream(outputLog);
         } catch (FileNotFoundException e1) {
             e1.printStackTrace();
         }
 
+        PrintStream out = System.out;
+        PrintStream err = System.err;
         PrintStream ps = new PrintStream(fos);
         System.setOut(ps);
         System.setErr(ps);
 
         try {
-            Class.forName("org.eclipse.transformer.jakarta.JakartaTransformer");
-        } catch (Throwable e) {
-            String mesg = "Unable to load the org.eclipse.transformer.jakarta.JakartaTransformer class. " +
-                          "Did you remember to include 'addRequiredLibraries.dependsOn addJakartaTransformer' in the FATs build.gradle file?";
-            Log.error(c, m, e, mesg);
-            throw new RuntimeException(mesg, e);
-        }
-
-        Path outputPath;
-        Path backupPath = null;
-        if (newAppPath == null) {
-            outputPath = appPath.resolveSibling(appPath.getFileName() + ".jakarta");
-            Path parent1 = appPath.toAbsolutePath().getParent();
-            if (parent1 != null) {
-                Path parent2 = parent1.getParent();
-                if (parent2 != null) {
-                    backupPath = parent2.resolve("backup");
-                    try {
-                        if (!Files.exists(backupPath)) {
-                            Files.createDirectory(backupPath); // throws IOException
-                        }
-                    } catch (IOException e) {
-                        Log.info(c, m, "Unable to create backup directory.");
-                        Log.error(c, m, e);
-                        throw new RuntimeException(e);
-                    }
-                } else {
-                    Log.info(c, m, "Unable to create backup directory.");
-                    FileNotFoundException fnfe = new FileNotFoundException("Parent path not found: " + parent1.toAbsolutePath().toString());
-                    Log.error(c, m, fnfe);
-                }
-            } else {
-                Log.info(c, m, "Unable to create backup directory.");
-                FileNotFoundException fnfe = new FileNotFoundException("Parent path not found: " + appPath.toAbsolutePath().toString());
-                Log.error(c, m, fnfe);
-            }
-        } else {
-            outputPath = newAppPath;
-        }
-
-        try {
-            // Invoke the jakarta transformer
-            String[] args = new String[15 + TRANSFORMATION_RULES_APPEND.size() * 2];
-
-            args[0] = appPath.toAbsolutePath().toString(); // input
-            args[1] = outputPath.toAbsolutePath().toString(); // output
-
-            args[2] = "-q"; // quiet output
-
-            // override jakarta default properties, which are
-            // packaged in the transformer jar
-            args[3] = "-tr"; // package-renames
-            args[4] = DEFAULT_TRANSFORMATION_RULES.get("-tr");
-            args[5] = "-ts"; // file selections and omissions
-            args[6] = DEFAULT_TRANSFORMATION_RULES.get("-ts");
-            args[7] = "-tv"; // package version updates
-            args[8] = DEFAULT_TRANSFORMATION_RULES.get("-tv");
-            args[9] = "-tb"; // bundle identity updates
-            args[10] = DEFAULT_TRANSFORMATION_RULES.get("-tb");
-            args[11] = "-td"; // exact java string constant updates
-            args[12] = DEFAULT_TRANSFORMATION_RULES.get("-td");
-            args[13] = "-tf"; // master xml subsitution file
-            args[14] = DEFAULT_TRANSFORMATION_RULES.get("-tf");
-
-            // Go through the additions
-            if (TRANSFORMATION_RULES_APPEND.size() > 0) {
-                String[] additions = new String[TRANSFORMATION_RULES_APPEND.size() * 2];
-                int index = 0;
-                for (Entry<String, String> addition : TRANSFORMATION_RULES_APPEND.entrySet()) {
-                    additions[index++] = addition.getKey();
-                    additions[index++] = addition.getValue();
-                }
-                System.arraycopy(additions, 0, args, 15, TRANSFORMATION_RULES_APPEND.size() * 2);
-            }
-
-            Log.info(c, m, "Initializing transformer with args: " + Arrays.toString(args));
-
-            // Note the use of 'com.ibm.ws.JakartaTransformer'.
-            // 'org.eclipse.transformer.Transformer' might also be used instead.
-
-            JakartaTransformer.main(args);
-
-            if (outputPath.toFile().exists()) {
-                if (backupPath != null) {
-                    Path backupAppPath = backupPath.resolve(appPath.getFileName());
-
-                    /*
-                     * Move original to backup.
-                     *
-                     * Don't use Files.move, b/c it can lead to:
-                     *
-                     * java.nio.file.FileSystemException: The process cannot access the
-                     * file because it is being used by another process.
-                     */
-                    FileUtils.copyDirectory(appPath.toFile(), backupAppPath.toFile());
-                    FileUtils.recursiveDelete(appPath.toFile());
-
-                    /*
-                     * Rename jakarta app to the original filename
-                     */
-                    FileUtils.copyDirectory(outputPath.toFile(), appPath.toFile());
-                    FileUtils.recursiveDelete(outputPath.toFile());
-                }
-            } else {
-                throw new RuntimeException("Jakarta transformer failed for: " + appPath);
-            }
-            //At this point the transformer was successful, delete output
-            if (outputLog.exists()) {
-                outputLog.delete();
-            }
-        } catch (Exception e) {
-            Log.info(c, m, "Unable to transform app at path: " + appPath);
-            Log.error(c, m, e);
-            throw new RuntimeException(e);
-        } finally {
             try {
-                fos.close();
-            } catch (IOException e) {
+                Class.forName("org.eclipse.transformer.jakarta.JakartaTransformer");
+            } catch (Throwable e) {
+                String mesg = "Unable to load the org.eclipse.transformer.jakarta.JakartaTransformer class. " +
+                              "Did you remember to include 'addRequiredLibraries.dependsOn addJakartaTransformer' in the FATs build.gradle file?";
+                Log.error(c, m, e, mesg);
+                throw new RuntimeException(mesg, e);
             }
-            Log.info(c, m, "Transforming complete app: " + outputPath);
+
+            Path outputPath;
+            if (newAppPath == null) {
+                outputPath = getTransformedAppPath(appPath).toAbsolutePath();
+            } else {
+                outputPath = newAppPath.toAbsolutePath();
+            }
+            Log.info(c, m, "outputPath: " + outputPath);
+
+            try {
+                //Initializing transformer args
+                String[] args = getTransformerArgs(appPath, outputPath);
+                Log.info(c, m, "Initializing transformer with args: " + Arrays.toString(args));
+
+                // Invoke the jakarta transformer
+                // Note the use of 'com.ibm.ws.JakartaTransformer'.
+                // 'org.eclipse.transformer.Transformer' might also be used instead.
+                JakartaTransformer.main(args);
+
+                //Move original to backup.
+                Path backupPath = getBackupAppPath(appPath).toAbsolutePath();
+                Log.info(c, m, "backupPath: " + backupPath);
+                movePath(appPath, backupPath);
+
+                // Copy jakarta app to the original filename
+                Log.info(c, m, "Replacing original: " + appPath + " with transformed: " + outputPath);
+                copyPath(outputPath, appPath);
+
+                //It is actually useful to keep the transformed app for local use
+//            if (outputLog.exists()) {
+//                outputLog.delete();
+//            }
+            } catch (Exception e) {
+                Log.info(c, m, "Unable to transform app at path: " + appPath);
+                Log.error(c, m, e);
+                throw new RuntimeException(e);
+            } finally {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                }
+                Log.info(c, m, "Transforming complete app: " + outputPath);
+            }
+        } finally {
+            //set system out and err back to what they were before
+            System.setOut(out);
+            System.setErr(err);
         }
+    }
+
+    private static String[] getTransformerArgs(Path appPath, Path outputPath) {
+        String[] args = new String[15 + TRANSFORMATION_RULES_APPEND.size() * 2];
+
+        args[0] = appPath.toAbsolutePath().toString(); // input
+        args[1] = outputPath.toAbsolutePath().toString(); // output
+
+        args[2] = "-q"; // quiet output
+
+        // override jakarta default properties, which are
+        // packaged in the transformer jar
+        args[3] = "-tr"; // package-renames
+        args[4] = DEFAULT_TRANSFORMATION_RULES.get("-tr");
+        args[5] = "-ts"; // file selections and omissions
+        args[6] = DEFAULT_TRANSFORMATION_RULES.get("-ts");
+        args[7] = "-tv"; // package version updates
+        args[8] = DEFAULT_TRANSFORMATION_RULES.get("-tv");
+        args[9] = "-tb"; // bundle identity updates
+        args[10] = DEFAULT_TRANSFORMATION_RULES.get("-tb");
+        args[11] = "-td"; // exact java string constant updates
+        args[12] = DEFAULT_TRANSFORMATION_RULES.get("-td");
+        args[13] = "-tf"; // master xml subsitution file
+        args[14] = DEFAULT_TRANSFORMATION_RULES.get("-tf");
+
+        // Go through the additions
+        if (TRANSFORMATION_RULES_APPEND.size() > 0) {
+            String[] additions = new String[TRANSFORMATION_RULES_APPEND.size() * 2];
+            int index = 0;
+            for (Entry<String, String> addition : TRANSFORMATION_RULES_APPEND.entrySet()) {
+                additions[index++] = addition.getKey();
+                additions[index++] = addition.getValue();
+            }
+            System.arraycopy(additions, 0, args, 15, TRANSFORMATION_RULES_APPEND.size() * 2);
+        }
+        return args;
+    }
+
+    /**
+     * Move the source path and its contents to the target path. May be either a file or dir.
+     *
+     * @param  source      The path to move.
+     * @param  target      The path to move to.
+     * @throws IOException If an I/O error occurs moving the path.
+     */
+    private static void movePath(Path source, Path dest) throws IOException {
+        final String m = "movePath";
+        /*
+         * Don't use Files.move, b/c it can lead to:
+         *
+         * java.nio.file.FileSystemException: The process cannot access the
+         * file because it is being used by another process.
+         */
+        copyPath(source, dest);
+        Log.info(c, m, "Deleting: " + source);
+        FileUtils.recursiveDelete(source.toFile());
+    }
+
+    /**
+     * Copy the source directory and its contents to the target directory.
+     *
+     * @param  source      The directory to make a copy of.
+     * @param  target      The directory to copy to.
+     * @throws IOException If an I/O error occurs copying the directory.
+     */
+    private static void copyPath(Path source, Path dest) throws IOException {
+        final String m = "copyPath";
+        Log.info(c, m, "Copying from: " + source + " to: " + dest);
+        FileUtils.copyDirectory(source.toFile(), dest.toFile());
+    }
+
+    /**
+     * Get a Path to where the transformer log file should be.
+     *
+     * @param  appPath
+     * @return
+     */
+    private static File getTransformerLogFile(Path appPath) {
+        String filename = "transformer_" + appPath.getFileName() + ".log";
+        Path logPath = getTransformerPath().resolve(filename);
+        File logFile = logPath.toFile();
+        return logFile;
+    }
+
+    /**
+     * Get a Path to where a transformed version of an app should be.
+     *
+     * @param  appPath
+     * @return
+     */
+    private static Path getTransformedAppPath(Path appPath) {
+        String filename = appPath.getFileName().toString();
+        Path transformedPath = getTransformedPath().resolve(filename);
+        return transformedPath;
+    }
+
+    /**
+     * Get a Path to where a backup of an app should be.
+     *
+     * @param  appPath
+     * @return
+     */
+    private static Path getBackupAppPath(Path appPath) {
+        String filename = appPath.getFileName().toString();
+        Path backupPath = getBackupPath().resolve(filename);
+        return backupPath;
+    }
+
+    /**
+     * Get a Path to the working dir for this transformer. Ensure it exists.
+     * Currently this is just "jakarta" but it may be that EE9 and EE10 apps need to be
+     * transformed differently. In such a case we may want to use separate folders.
+     *
+     * @return
+     */
+    private static Path getTransformerPath() {
+        Path rootPath = getTransformerWorkingDir();
+        Path transformerPath = getSubPath(rootPath, "jakarta");
+        return transformerPath;
+    }
+
+    /**
+     * Get a Path to the dir where the original apps should be backed up to. Ensure it exists.
+     *
+     * @return
+     */
+    private static Path getBackupPath() {
+        Path rootPath = getTransformerPath();
+        Path backupPath = getSubPath(rootPath, "original");
+        return backupPath;
+    }
+
+    /**
+     * Get a Path to the dir where transformed apps should be output. Ensure it exists.
+     *
+     * @return
+     */
+    private static Path getTransformedPath() {
+        Path rootPath = getTransformerPath();
+        Path transformedPath = getSubPath(rootPath, "transformed");
+        return transformedPath;
+    }
+
+    /**
+     * Get a sub-directory Path. Ensure it exists.
+     *
+     * @param  parent
+     * @param  subName
+     * @return
+     */
+    private static Path getSubPath(Path parent, String subName) {
+        Path subPath = parent.resolve(subName);
+        mkdirs(subPath);
+        return subPath;
+    }
+
+    /**
+     * Get a Path which represents the transformer working directory. Ensure that it exists.
+     *
+     * @return the transformer working dir
+     */
+    private static Path getTransformerWorkingDir() {
+        String dirName = "transformer";
+        File file = mkdirs(new File(dirName));
+        Path path = file.toPath();
+        return path;
+    }
+
+    /**
+     * Ensure that a directory exists. If it does not, try to create it.
+     *
+     * @param  path A Path that represents the directory
+     * @return      return the created dir Path
+     */
+    private static Path mkdirs(Path path) {
+        File file = path.toFile();
+        mkdirs(file);
+        return path;
+    }
+
+    /**
+     * Ensure that a directory exists. If it does not, try to create it.
+     *
+     * @param  dir A File that represents the directory
+     * @return     return the created dir File
+     */
+    private static File mkdirs(File dir) {
+        final String m = "mkdirs";
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                String msg = "Failed to create directory: " + dir;
+                Log.info(c, m, msg);
+                RuntimeException e = new RuntimeException(msg);
+                Log.error(c, m, e);
+                throw e;
+            }
+        } else if (!dir.isDirectory()) {
+            String msg = "File already exists but is not a directory: " + dir;
+            Log.info(c, m, msg);
+            RuntimeException e = new RuntimeException(msg);
+            Log.error(c, m, e);
+            throw e;
+        }
+        return dir;
     }
 }

@@ -16,6 +16,8 @@ import java.util.Set;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+
+import componenttest.rules.repeater.AbstractReplacementAction;
 import componenttest.rules.repeater.FeatureReplacementAction;
 
 @RunWith(Suite.class)
@@ -44,7 +46,7 @@ public class FATSuite {
         return MP_REST_CLIENT(new FeatureReplacementAction(), version, serverName);
     }
 
-    static FeatureReplacementAction MP_REST_CLIENT(FeatureReplacementAction action, String version, String serverName) {
+    static <T extends AbstractReplacementAction<T>> T MP_REST_CLIENT(T action, String version, String serverName) {
         return use(action, "mpRestClient", version)
                         .withID("mpRestClient-" + version)
                         .forServers(serverName);
@@ -54,7 +56,7 @@ public class FATSuite {
         return MP_REST_CLIENT_WITH_CONFIG(new FeatureReplacementAction(), version, serverName);
     }
 
-    static FeatureReplacementAction MP_REST_CLIENT_WITH_CONFIG(FeatureReplacementAction action, String version, String serverName) {
+    static <T extends AbstractReplacementAction<T>> T MP_REST_CLIENT_WITH_CONFIG(T action, String version, String serverName) {
         action = use(action, "mpRestClient", version)
                         .withID("mpRestClient-" + version)
                         .forServers(serverName);
@@ -69,11 +71,11 @@ public class FATSuite {
         }
     }
 
-    private static FeatureReplacementAction use(FeatureReplacementAction action, String featureName, String version) {
+    private static <T extends AbstractReplacementAction<T>> T use(T action, String featureName, String version) {
         return use(action, featureName, version, ALL_VERSIONS);
     }
 
-    private static FeatureReplacementAction use(FeatureReplacementAction action, String featureName, String version, String... versionsToRemove) {
+    private static <T extends AbstractReplacementAction<T>> T use(T action, String featureName, String version, String... versionsToRemove) {
         action = action.addFeature(featureName + "-" + version);
         Set<String> featuresToRemove = new HashSet<>();
         for (String remove : versionsToRemove) {

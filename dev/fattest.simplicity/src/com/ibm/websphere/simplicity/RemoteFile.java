@@ -950,18 +950,20 @@ public class RemoteFile {
      * @return      The parent path of the file
      */
     private String getParentPath(String path) {
-        if (path.equals("/")) { // root
-            return null;
-        }
-        path = path.replace('\\', '/');
-        if (path.endsWith("/"))
-            path = path.substring(0, path.length() - 1);
-        int endIndex = path.lastIndexOf("/");
-        if (endIndex != -1) {
-            path = path.substring(0, endIndex);
-        }
-        if (path.length() == 0) {
-            path = "/";
+        if (path != null) {
+            if (path.equals("/")) { // root
+                return null;
+            }
+            path = path.replace('\\', '/');
+            if (path.endsWith("/"))
+                path = path.substring(0, path.length() - 1);
+            int endIndex = path.lastIndexOf("/");
+            if (endIndex != -1) {
+                path = path.substring(0, endIndex);
+            }
+            if (path.length() == 0) {
+                path = "/";
+            }
         }
         return path;
     }

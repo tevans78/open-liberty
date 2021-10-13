@@ -19,8 +19,8 @@ public class EERepeatTests {
         EE7, EE8, EE9, EE7_FULL, EE8_FULL, EE9_FULL
     }
 
-    public static FeatureReplacementAction getEEAction(EEVersion version, String serverName, String clientName) {
-        FeatureReplacementAction action = null;
+    public static AbstractReplacementAction<?> getEEAction(EEVersion version, String serverName, String clientName) {
+        AbstractReplacementAction<?> action = null;
         switch (version) {
             case EE7: {
                 action = FeatureReplacementAction.EE7_FEATURES();

@@ -205,8 +205,8 @@ public class MicroProfileActions {
                                                           "mpFaultTolerance-4.0",
                                                           "mpHealth-4.0",
                                                           "mpJwt-2.0",
-                                                          "mpOpenAPI-3.0" };
-//                                                          "mpMetrics-4.0",
+                                                          "mpOpenAPI-3.0",
+                                                          "mpMetrics-4.0" };
 //                                                          "mpOpenTracing-3.0",
 //                                                          "mpRestClient-3.0" };
 
@@ -421,8 +421,8 @@ public class MicroProfileActions {
      * @param  testMode       The test mode to run the FeatureSet
      * @return                A FeatureReplacementAction instance
      */
-    public static FeatureReplacementAction forFeatureSet(Set<FeatureSet> allFeatureSets, FeatureSet featureSet, String server, TestMode testMode) {
-        FeatureReplacementAction action = null;
+    public static AbstractReplacementAction<?> forFeatureSet(Set<FeatureSet> allFeatureSets, FeatureSet featureSet, String server, TestMode testMode) {
+        AbstractReplacementAction<?> action = null;
         EEVersion eeVersion = featureSet.getEEVersion();
         if (eeVersion == EEVersion.EE7)
             action = new EE7FeatureReplacementAction();

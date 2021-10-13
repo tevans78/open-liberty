@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class EE8FeatureReplacementAction extends FeatureReplacementAction {
+public class EE8FeatureReplacementAction extends AbstractReplacementAction<EE8FeatureReplacementAction> {
 
     public static final String ID = "EE8_FEATURES";
 

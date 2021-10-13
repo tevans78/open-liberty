@@ -11,7 +11,6 @@
 package componenttest.rules.repeater;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,14 +18,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.ibm.websphere.simplicity.ShrinkHelper;
-import com.ibm.ws.fat.util.SharedServer;
-
-import componenttest.custom.junit.runner.Mode.TestMode;
 import componenttest.custom.junit.runner.RepeatTestFilter;
-import componenttest.topology.impl.LibertyServer;
-import componenttest.topology.impl.LibertyServerFactory;
-import componenttest.topology.utils.FileUtils;
 
 /**
  * Test repeat action that will do 2 things:
@@ -35,11 +27,11 @@ import componenttest.topology.utils.FileUtils;
  * <li>Update all server.xml configs under the autoFVT/publish/ folder to use EE 10 features</li>
  * </ol>
  */
-public class JakartaEE10Action extends FeatureReplacementAction {
+public class JakartaEE10Action extends AbstractReplacementAction<JakartaEE10Action> {
     public static final String ID = "EE10_FEATURES";
 
     private static final String TRANSFORMER_RULES_APPEND_ROOT = System.getProperty("user.dir") + "/publish/rules/";
-    private static final Map<String,String> TRANSFORMATION_RULES_APPEND = new HashMap();
+    private static final Map<String, String> TRANSFORMATION_RULES_APPEND = new HashMap<String, String>();
 
     // TODO This will eventually be a list of Jakarta EE 10 features.
     // TODO Replace EE 9 features in the list below with EE 10 features when they are added.
@@ -112,69 +104,12 @@ public class JakartaEE10Action extends FeatureReplacementAction {
         return "JakartaEE10 FAT repeat action";
     }
 
-    //
-
-    @Override
-    public JakartaEE10Action addFeature(String addFeature) {
-        return (JakartaEE10Action) super.addFeature(addFeature);
-    }
-
-    @Override
-    public JakartaEE10Action fullFATOnly() {
-        return (JakartaEE10Action) super.fullFATOnly();
-    }
-
-    @Override
-    public JakartaEE10Action liteFATOnly() {
-        return (JakartaEE10Action) super.liteFATOnly();
-    }
-
-    @Override
-    public JakartaEE10Action withTestMode(TestMode mode) {
-        return (JakartaEE10Action) super.withTestMode(mode);
-    }
-
-    @Override
-    public JakartaEE10Action addFeatures(Set<String> addFeatures) {
-        return (JakartaEE10Action) super.addFeatures(addFeatures);
-    }
-
-    @Override
-    public JakartaEE10Action removeFeature(String removeFeature) {
-        return (JakartaEE10Action) super.removeFeature(removeFeature);
-    }
-
-    @Override
-    public JakartaEE10Action removeFeatures(Set<String> removeFeatures) {
-        return (JakartaEE10Action) super.removeFeatures(removeFeatures);
-    }
-
-    @Override
-    public JakartaEE10Action withMinJavaLevel(int javaLevel) {
-        return (JakartaEE10Action) super.withMinJavaLevel(javaLevel);
-    }
-
-    @Override
-    public JakartaEE10Action withID(String id) {
-        return (JakartaEE10Action) super.withID(id);
-    }
-
-    @Override
-    public JakartaEE10Action forServers(String... serverNames) {
-        return (JakartaEE10Action) super.forServers(serverNames);
-    }
-
-    @Override
-    public JakartaEE10Action forClients(String... clientNames) {
-        return (JakartaEE10Action) super.forClients(clientNames);
-    }
-
     /**
-     * Specifies which file in the rules directory of the FAT will be used for 
+     * Specifies which file in the rules directory of the FAT will be used for
      * adding additional package transformations.
-     * 
-     * @param fileName    The file name in the publish/rules directory to use for appending
-     * 
+     *
+     * @param fileName The file name in the publish/rules directory to use for appending
+     *
      */
     public JakartaEE10Action withLocalPackageTransformAppend(String fileName) {
         TRANSFORMATION_RULES_APPEND.put("-tr", TRANSFORMER_RULES_APPEND_ROOT + fileName);
@@ -182,10 +117,10 @@ public class JakartaEE10Action extends FeatureReplacementAction {
     }
 
     /**
-     * Specifies which file in the rules directory of the FAT will be used for 
+     * Specifies which file in the rules directory of the FAT will be used for
      * adding additional selection transformations.
-     * 
-     * @param fileName    The file name in the publish/rules directory to use for appending
+     *
+     * @param fileName The file name in the publish/rules directory to use for appending
      *
      */
     public JakartaEE10Action withLocalSelectionTransformAppend(String fileName) {
@@ -194,10 +129,10 @@ public class JakartaEE10Action extends FeatureReplacementAction {
     }
 
     /**
-     * Specifies which file in the rules directory of the FAT will be used for 
+     * Specifies which file in the rules directory of the FAT will be used for
      * adding additional version transformations.
-     * 
-     * @param fileName    The file name in the publish/rules directory to use for appending
+     *
+     * @param fileName The file name in the publish/rules directory to use for appending
      *
      */
     public JakartaEE10Action withLocalVersionTransformAppend(String fileName) {
@@ -206,10 +141,10 @@ public class JakartaEE10Action extends FeatureReplacementAction {
     }
 
     /**
-     * Specifies which file in the rules directory of the FAT will be used for 
+     * Specifies which file in the rules directory of the FAT will be used for
      * adding additional bundle transformations.
-     * 
-     * @param fileName    The file name in the publish/rules directory to use for appending
+     *
+     * @param fileName The file name in the publish/rules directory to use for appending
      *
      */
     public JakartaEE10Action withLocalBundleTransformAppend(String fileName) {
@@ -218,10 +153,10 @@ public class JakartaEE10Action extends FeatureReplacementAction {
     }
 
     /**
-     * Specifies which file in the rules directory of the FAT will be used for 
+     * Specifies which file in the rules directory of the FAT will be used for
      * adding additional string transformations.
-     * 
-     * @param fileName    The file name in the publish/rules directory to use for appending
+     *
+     * @param fileName The file name in the publish/rules directory to use for appending
      *
      */
     public JakartaEE10Action withLocalStringTransformAppend(String fileName) {
@@ -230,10 +165,10 @@ public class JakartaEE10Action extends FeatureReplacementAction {
     }
 
     /**
-     * Specifies which file in the rules directory of the FAT will be used for 
+     * Specifies which file in the rules directory of the FAT will be used for
      * adding additional xml transformations.
-     * 
-     * @param fileName    The file name in the publish/rules directory to use for appending
+     *
+     * @param fileName The file name in the publish/rules directory to use for appending
      *
      */
     public JakartaEE10Action withLocalXMLTransformAppend(String fileName) {
@@ -243,14 +178,7 @@ public class JakartaEE10Action extends FeatureReplacementAction {
 
     @Override
     public void setup() throws Exception {
-        // Ensure all shared servers are stopped and applications are cleaned
-        LibertyServerFactory.tidyAllKnownServers(SharedServer.class.getCanonicalName());
-        LibertyServerFactory.recoverAllServers(SharedServer.class.getCanonicalName());
-        for (LibertyServer server : LibertyServerFactory.getKnownLibertyServers(SharedServer.class.getCanonicalName())) {
-            Path rootPath = Paths.get(server.getServerRoot());
-            FileUtils.recursiveDelete(rootPath.toFile());
-        }
-        ShrinkHelper.cleanAllExportedArchives();
+        JakartaEE9Action.clean();
 
         // Transform server.xml's
         super.setup();
@@ -270,7 +198,7 @@ public class JakartaEE10Action extends FeatureReplacementAction {
      * @param appPath The application path to be transformed to Jakarta
      */
     public static void transformApp(Path appPath) {
-        if(TRANSFORMATION_RULES_APPEND.isEmpty())
+        if (TRANSFORMATION_RULES_APPEND.isEmpty())
             JakartaEE9Action.transformApp(appPath, null);
         else
             JakartaEE9Action.transformApp(appPath, null, TRANSFORMATION_RULES_APPEND);
@@ -290,7 +218,7 @@ public class JakartaEE10Action extends FeatureReplacementAction {
      * @param newAppPath The application path of the transformed file (or <code>null<code>)
      */
     public static void transformApp(Path appPath, Path newAppPath) {
-        if(TRANSFORMATION_RULES_APPEND.isEmpty())
+        if (TRANSFORMATION_RULES_APPEND.isEmpty())
             JakartaEE9Action.transformApp(appPath, newAppPath);
         else
             JakartaEE9Action.transformApp(appPath, newAppPath, TRANSFORMATION_RULES_APPEND);

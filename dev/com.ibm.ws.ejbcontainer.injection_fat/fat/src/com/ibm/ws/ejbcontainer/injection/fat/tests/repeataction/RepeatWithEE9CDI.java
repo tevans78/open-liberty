@@ -11,7 +11,6 @@
 package com.ibm.ws.ejbcontainer.injection.fat.tests.repeataction;
 
 import componenttest.custom.junit.runner.RepeatTestFilter;
-import componenttest.rules.repeater.FeatureReplacementAction;
 import componenttest.rules.repeater.JakartaEE9Action;
 
 /**
@@ -26,7 +25,7 @@ public class RepeatWithEE9CDI extends JakartaEE9Action {
         withID(ID);
     }
 
-    public static FeatureReplacementAction EE9CDI_FEATURES() {
+    public static JakartaEE9Action EE9CDI_FEATURES() {
         return new RepeatWithEE9CDI();
     }
 

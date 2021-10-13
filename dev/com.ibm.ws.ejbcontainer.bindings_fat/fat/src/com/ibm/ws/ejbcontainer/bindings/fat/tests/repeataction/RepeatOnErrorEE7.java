@@ -16,7 +16,6 @@ import com.ibm.websphere.simplicity.log.Log;
 
 import componenttest.custom.junit.runner.RepeatTestFilter;
 import componenttest.rules.repeater.EE7FeatureReplacementAction;
-import componenttest.rules.repeater.FeatureReplacementAction;
 import componenttest.topology.impl.LibertyServer;
 import componenttest.topology.impl.LibertyServerFactory;
 
@@ -56,7 +55,7 @@ public class RepeatOnErrorEE7 extends EE7FeatureReplacementAction {
     }
 
     @Override
-    public FeatureReplacementAction forServers(String... serverNames) {
+    public EE7FeatureReplacementAction forServers(String... serverNames) {
         if (serverNames == null || serverNames.length != 1) {
             throw new IllegalStateException("Only 1 server supported by " + getClass().getSimpleName() + " repeat action");
         }
