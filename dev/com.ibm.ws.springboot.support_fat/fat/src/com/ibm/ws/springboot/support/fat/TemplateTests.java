@@ -28,7 +28,7 @@ import com.ibm.websphere.simplicity.Machine;
 import com.ibm.websphere.simplicity.ProgramOutput;
 import com.ibm.websphere.simplicity.RemoteFile;
 
-import componenttest.common.apiservices.Bootstrap;
+import com.ibm.websphere.simplicity.Bootstrap;
 import componenttest.custom.junit.runner.FATRunner;
 import componenttest.custom.junit.runner.Mode;
 import componenttest.topology.impl.LibertyFileManager;

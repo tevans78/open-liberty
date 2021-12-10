@@ -17,13 +17,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.ibm.websphere.simplicity.Bootstrap;
 import com.ibm.websphere.simplicity.LocalFile;
 import com.ibm.websphere.simplicity.Machine;
 import com.ibm.websphere.simplicity.ProgramOutput;
 import com.ibm.websphere.simplicity.RemoteFile;
 import com.ibm.websphere.simplicity.log.Log;
 
-import componenttest.common.apiservices.Bootstrap;
 import componenttest.exception.TopologyException;
 import componenttest.topology.utils.PrivHelper;
 
@@ -157,9 +157,10 @@ public class LibertyClientFactory {
      * client XML, that includes fatTestPorts.xml and the sample client.xml. The bootstrap.properties will be exchanged with a default properties file that includes the
      * "../testports.properties" file and the sample properties file. The client will then be added to the list of known clients and returned.
      *
-     * @param clientName The name of the client to install, must be matched by a local file named clientName.jar in the lib/LibertyFATTestFiles folder (populated from publish/files
-     *            in a FAT test project)
-     * @param bootstrap The bootstrap to use on the client
+     * @param clientName  The name of the client to install, must be matched by a local file named clientName.jar in the lib/LibertyFATTestFiles folder (populated from
+     *                        publish/files
+     *                        in a FAT test project)
+     * @param bootstrap   The bootstrap to use on the client
      * @param ignoreCache <code>false</code> if we should load a cached client if available
      * @return The client
      *

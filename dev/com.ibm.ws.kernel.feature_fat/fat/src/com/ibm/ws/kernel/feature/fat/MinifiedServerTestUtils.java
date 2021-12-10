@@ -35,7 +35,7 @@ import com.ibm.websphere.simplicity.ProgramOutput;
 import com.ibm.websphere.simplicity.RemoteFile;
 import com.ibm.websphere.simplicity.log.Log;
 
-import componenttest.common.apiservices.Bootstrap;
+import com.ibm.websphere.simplicity.Bootstrap;
 import componenttest.topology.impl.LibertyServer;
 import componenttest.topology.impl.LibertyServer.IncludeArg;
 import componenttest.topology.impl.LibertyServerFactory;

@@ -50,8 +50,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import com.ibm.websphere.simplicity.Bootstrap;
 import com.ibm.websphere.simplicity.ConnectionInfo;
 import com.ibm.websphere.simplicity.LocalFile;
+import com.ibm.websphere.simplicity.LocalMachine;
 import com.ibm.websphere.simplicity.Machine;
 import com.ibm.websphere.simplicity.OperatingSystem;
 import com.ibm.websphere.simplicity.PortType;
@@ -63,8 +65,6 @@ import com.ibm.websphere.simplicity.config.ClientConfigurationFactory;
 import com.ibm.websphere.simplicity.log.Log;
 import com.ibm.websphere.soe_reporting.SOEHttpPostUtil;
 
-import componenttest.common.apiservices.Bootstrap;
-import componenttest.common.apiservices.LocalMachine;
 import componenttest.custom.junit.runner.LogPolice;
 import componenttest.exception.TopologyException;
 import componenttest.topology.impl.JavaInfo.Vendor;
@@ -260,7 +260,7 @@ public class LibertyClient {
      * Protected - This constructor is protected as users should use the
      * LibertyClientFactory's static methods to get LibertyClient instances.
      *
-     * @param  clientName The name of the client that is going to used
+     * @param clientName The name of the client that is going to used
      * @throws Exception
      */
     protected LibertyClient(String clientName, Bootstrap b) throws Exception {
@@ -448,7 +448,7 @@ public class LibertyClient {
      * in the {@code List<String>}. Each String should be the only feature
      * name, e.g. servlet-3.0
      *
-     * @param  newFeatures
+     * @param newFeatures
      * @throws Exception
      */
     public void changeFeatures(List<String> newFeatures) throws Exception {
@@ -864,11 +864,11 @@ public class LibertyClient {
      * With this change, if intendedTimeout is exceeded, we report this to the SOE client
      * but do not consider it a test failure. Only if extendedTimeout is exceeded will we return a not-found indication.
      *
-     * @param  regexp          a regular expression to search for
-     * @param  intendedTimeout a timeout, in milliseconds, within which string was expected to occur
-     * @param  extendedTimeout a timeout, in milliseconds, within which string may acceptably occur
-     * @param  outputFile      file to check
-     * @return                 line that matched the regexp, or null to indicate not found within acceptable (extended) timeout
+     * @param regexp          a regular expression to search for
+     * @param intendedTimeout a timeout, in milliseconds, within which string was expected to occur
+     * @param extendedTimeout a timeout, in milliseconds, within which string may acceptably occur
+     * @param outputFile      file to check
+     * @return line that matched the regexp, or null to indicate not found within acceptable (extended) timeout
      */
     protected String validateAppsLoaded(List<String> appList, int intendedTimeout, int extendedTimeout, RemoteFile outputFile) throws Exception {
         final String method = "validateAppsLoaded";
@@ -1521,7 +1521,7 @@ public class LibertyClient {
     }
 
     /**
-     * @param  method
+     * @param method
      * @throws Exception
      */
     protected void recursivelyCopyDirectory(RemoteFile remoteDirectory, LocalFile destination, boolean ignoreFailures, boolean skipArchives, boolean moveFile) throws Exception {
@@ -1603,9 +1603,9 @@ public class LibertyClient {
      *
      * If copying a file the destination will be overwritten.
      *
-     * @param  pathInClientRoot The path to the file or directory in the client root, must not start with a "/"
-     * @param  destination      The place within the temp folder to store this file, must not start with a "/"
-     * @return                  the LocalFile of the copied RemoteFile
+     * @param pathInClientRoot The path to the file or directory in the client root, must not start with a "/"
+     * @param destination      The place within the temp folder to store this file, must not start with a "/"
+     * @return the LocalFile of the copied RemoteFile
      * @throws Exception
      */
     public LocalFile copyFileToTempDir(String pathInClientRoot, String destination) throws Exception {
@@ -1619,9 +1619,9 @@ public class LibertyClient {
      *
      * If copying a file the destination will be overwritten.
      *
-     * @param  pathInInstallRoot The path to the file or directory in the install root, must not start with a "/"
-     * @param  destination       The place within the temp folder to store this file, must not start with a "/"
-     * @return                   the LocalFile of the copied RemoteFile
+     * @param pathInInstallRoot The path to the file or directory in the install root, must not start with a "/"
+     * @param destination       The place within the temp folder to store this file, must not start with a "/"
+     * @return the LocalFile of the copied RemoteFile
      * @throws Exception
      */
     public LocalFile copyInstallRootFileToTempDir(String pathInInstallRoot, String destination) throws Exception {
@@ -1799,9 +1799,9 @@ public class LibertyClient {
      * parameter is non-null, the indicated directory (relative the the install root). If filter is
      * non-null, return only those directory names or filenames that contain the filter string.
      *
-     * @param  relativeDir path to a directory relative to the install root directory, should not begin with path separator, may be null.
-     * @param  filter      string to filter the results by, returned file and directory names must contain this, may be null.
-     * @return             a list of file and directory names indicating the contents of the specified directory.
+     * @param relativeDir path to a directory relative to the install root directory, should not begin with path separator, may be null.
+     * @param filter      string to filter the results by, returned file and directory names must contain this, may be null.
+     * @return a list of file and directory names indicating the contents of the specified directory.
      * @throws Exception
      */
     public List<String> listLibertyInstallRoot(String relativeDir, String filter) throws Exception {
@@ -1817,9 +1817,9 @@ public class LibertyClient {
      * parameter is non-null, the indicated directory (relative the the install root). If filter is
      * non-null, return only those directory names or filenames that contain the filter string.
      *
-     * @param  relativeDir path to a directory relative to the install root directory, should not begin with path separator, may be null.
-     * @param  filter      string to filter the results by, returned file and directory names must contain this, may be null.
-     * @return             a list of file and directory names indicating the contents of the specified directory.
+     * @param relativeDir path to a directory relative to the install root directory, should not begin with path separator, may be null.
+     * @param filter      string to filter the results by, returned file and directory names must contain this, may be null.
+     * @return a list of file and directory names indicating the contents of the specified directory.
      * @throws Exception
      */
     public ArrayList<String> listLibertyClientRoot(String relativeDir, String filter) throws Exception {
@@ -1833,8 +1833,8 @@ public class LibertyClient {
     /**
      * Method for returning the directory contents as a list of Strings representing first level file/dir names
      *
-     * @return                   ArrayList of File/Directory names
-     *                           that exist at the first level i.e. it's not recursive. If it's a directory the String in the list is prefixed with a /
+     * @return ArrayList of File/Directory names
+     *         that exist at the first level i.e. it's not recursive. If it's a directory the String in the list is prefixed with a /
      * @throws TopologyException
      */
     protected ArrayList<String> listDirectoryContents(RemoteFile clientDir) throws Exception {
@@ -1960,7 +1960,7 @@ public class LibertyClient {
      * Under the covers this will not use the install functionality found in the
      * ApplicationManager but use the Application Csar which is part of Liberty.
      *
-     * @param  appName   The name of the application
+     * @param appName The name of the application
      * @throws Exception
      */
     protected void autoInstallApp(String appName) throws Exception {
@@ -1972,7 +1972,7 @@ public class LibertyClient {
      * Shortcut for new FATTests to install apps assuming the app is
      * located in the publish/clients/<clientName>/apps folder of the FAT project
      *
-     * @param  appName   The name of the application
+     * @param appName The name of the application
      * @throws Exception
      */
     public void installApp(String appName) throws Exception {
@@ -1983,8 +1983,8 @@ public class LibertyClient {
     /**
      * Shortcut for new FATTests to install apps located anywhere on the file system
      *
-     * @param  path      The absolute path to the application
-     * @param  appName   The name of the application
+     * @param path    The absolute path to the application
+     * @param appName The name of the application
      * @throws Exception
      */
     public void installApp(String path, String appName) throws Exception {
@@ -1997,7 +1997,7 @@ public class LibertyClient {
      * the FAT files directory, runs the self extractor with the --downloadDependencies and
      * --acceptLicense flag in order to create a working copy of the sample client for test.
      *
-     * @param  sample
+     * @param sample
      * @return
      * @throws Exception
      */
@@ -2060,7 +2060,7 @@ public class LibertyClient {
      * Method used by exposed installApp methods that calls into the ApplicationManager
      * to actually install the required application
      *
-     * @param  appPath   Absoulte path to application (includes app name)
+     * @param appPath Absoulte path to application (includes app name)
      * @throws Exception
      */
     protected void finalInstallApp(String appPath) throws Exception {
@@ -2091,7 +2091,7 @@ public class LibertyClient {
     /**
      * Shortcut for new FATTests to uninstall apps
      *
-     * @param  appName   The name of the application
+     * @param appName The name of the application
      * @throws Exception
      */
     public void uninstallApp(String appName) throws Exception {
@@ -2140,7 +2140,7 @@ public class LibertyClient {
      * Lines with a '=' in the middle are treated as key-value mappings,
      * and lines without a '=' character are treated as a key with an empty value.
      *
-     * @return           key/value pairs from the jvm.options file
+     * @return key/value pairs from the jvm.options file
      * @throws Exception if the file can't be read
      */
     public Map<String, String> getJvmOptionsAsMap() throws Exception {
@@ -2163,7 +2163,7 @@ public class LibertyClient {
     /**
      * Reads the current jvm.options file into memory and returns the result.
      *
-     * @return           key/value pairs from the jvm.options file
+     * @return key/value pairs from the jvm.options file
      * @throws Exception if the file can't be read
      */
     protected List<String> getJvmOptions() throws Exception {
@@ -2210,9 +2210,9 @@ public class LibertyClient {
      * <li>Non-empty keys mapped to a non-empty value will be added to jvm.options in the format: <code>key=value</code>.</li>
      * </ul>
      *
-     * @param  options   key/value pairs to set in the jvm.options file
+     * @param options key/value pairs to set in the jvm.options file
      * @throws Exception if the jvm.options file can't be written to. Note that this exception may indicate that the file is no longer formatted correctly.
-     * @see              #getJvmOptions()
+     * @see #getJvmOptions()
      */
     public void setJvmOptions(Map<String, String> options) throws Exception {
         ArrayList<String> optionList = new ArrayList<String>();
@@ -2351,7 +2351,7 @@ public class LibertyClient {
      * Replaces the client configuration. This encapsulates the necessary logic
      * to deal with system / JDK idiosyncrasies.
      *
-     * @param  fileName
+     * @param fileName
      * @throws Exception
      */
     protected void replaceClientConfiguration(String fileName) throws Exception {
@@ -2366,7 +2366,7 @@ public class LibertyClient {
      * statement or if the location of the config file is being changed using the was.configroot.uri property or --config-root command line then you should use the
      * {@link #copyFileToLibertyInstallRoot(String)} method.
      *
-     * @param  fileName  The name of the file from the FVT test suite
+     * @param fileName The name of the file from the FVT test suite
      * @throws Exception
      */
     public void setClientConfigurationFile(String fileName) throws Exception {
@@ -2414,7 +2414,7 @@ public class LibertyClient {
     /**
      * This will load the {@link ClientConfiguration} from the default config file returned from {@link #getClientConfigurationFile()}.
      *
-     * @return           The loaded {@link ClientConfiguration}
+     * @return The loaded {@link ClientConfiguration}
      * @throws Exception
      */
     public ClientConfiguration getClientConfiguration() throws Exception {
@@ -2425,8 +2425,8 @@ public class LibertyClient {
     /**
      * This gets the {@link ClientConfiguration} for the supplied XML file.
      *
-     * @param  file      The file to load the client configuration from
-     * @return           The loaded {@link ClientConfiguration}
+     * @param file The file to load the client configuration from
+     * @return The loaded {@link ClientConfiguration}
      * @throws Exception
      */
     public ClientConfiguration getClientConfiguration(RemoteFile file) throws Exception {
@@ -2445,8 +2445,8 @@ public class LibertyClient {
     /**
      * This updates the supplied file with the supplied config.
      *
-     * @param  clientConfig The config to store to the file
-     * @param  file         The file to store the config to
+     * @param clientConfig The config to store to the file
+     * @param file         The file to store the config to
      * @throws Exception
      */
     public void updateClientConfiguration(ClientConfiguration clientConfig, RemoteFile file) throws Exception {
@@ -2476,7 +2476,7 @@ public class LibertyClient {
     /**
      * This stores the supplied content to the default client XML file returned from {@link #getClientConfigurationFile()}.
      *
-     * @param  clientConfig The configuration to store
+     * @param clientConfig The configuration to store
      * @throws Exception
      */
     public void updateClientConfiguration(ClientConfiguration clientConfig) throws Exception {
@@ -2580,8 +2580,8 @@ public class LibertyClient {
      * worrying about the timestamp, it isn't very clever and just returns
      * the first match it finds.
      *
-     * @param  regex
-     * @return       a matching RemoteFile, or null if no match was found
+     * @param regex
+     * @return a matching RemoteFile, or null if no match was found
      */
     public RemoteFile getMatchingLogFile(String regex) throws Exception {
         Log.info(c, "getMatchingLogFile", "Looking for file matching regex: " + regex + " in " + logsRoot + " on " + machine);
@@ -2603,10 +2603,10 @@ public class LibertyClient {
      * This method will search the given file on this client for the specified expression.
      * The path given is relative to the install root directory.
      *
-     * @param  regexp    pattern to search for.
-     * @param  filePath  the pathname relative to the install root directory.
-     * @return           A list of the lines in the file that contains the matching
-     *                   pattern. No match results in an empty list.
+     * @param regexp   pattern to search for.
+     * @param filePath the pathname relative to the install root directory.
+     * @return A list of the lines in the file that contains the matching
+     *         pattern. No match results in an empty list.
      * @throws Exception
      */
     /* not called */public List<String> findStringsInFileInLibertyInstallRoot(String regexp, String filePath) throws Exception {
@@ -2619,10 +2619,10 @@ public class LibertyClient {
      * This method will search the given file on this client for the specified expression.
      * The path given is relative to the client root directory.
      *
-     * @param  regexp    pattern to search for.
-     * @param  filePath  the pathname relative to the client root directory.
-     * @return           A list of the lines in the file that contains the matching
-     *                   pattern. No match results in an empty list.
+     * @param regexp   pattern to search for.
+     * @param filePath the pathname relative to the client root directory.
+     * @return A list of the lines in the file that contains the matching
+     *         pattern. No match results in an empty list.
      * @throws Exception
      */
     public List<String> findStringsInFileInLibertyClientRoot(String regexp, String filePath) throws Exception {
@@ -2646,9 +2646,9 @@ public class LibertyClient {
      * This method will search the output and trace files for this client
      * for the specified expression. The default trace prefix is assumed.
      *
-     * @param  regexp    pattern to search for
-     * @return           A list of the lines in the trace files which contain the matching
-     *                   pattern. No match results in an empty list.
+     * @param regexp pattern to search for
+     * @return A list of the lines in the trace files which contain the matching
+     *         pattern. No match results in an empty list.
      * @throws Exception
      */
     public List<String> findStringsInLogs(String regexp) throws Exception {
@@ -2665,9 +2665,9 @@ public class LibertyClient {
      * This method will search the output and trace files for this client
      * for the specified expression. The default trace prefix is assumed.
      *
-     * @param  regexp    pattern to search for
-     * @return           A list of the lines in the trace files which contain the matching
-     *                   pattern. No match results in an empty list.
+     * @param regexp pattern to search for
+     * @return A list of the lines in the trace files which contain the matching
+     *         pattern. No match results in an empty list.
      * @throws Exception
      */
     public List<String> findStringsInLogs(String regexp, RemoteFile logFile) throws Exception {
@@ -2684,9 +2684,9 @@ public class LibertyClient {
      * This method will search the output and trace files for this client
      * for the specified expression. The default trace prefix is assumed.
      *
-     * @param  regexp    pattern to search for
-     * @return           A list of the lines in the trace files which contain the matching
-     *                   pattern. No match results in an empty list.
+     * @param regexp pattern to search for
+     * @return A list of the lines in the trace files which contain the matching
+     *         pattern. No match results in an empty list.
      * @throws Exception
      */
     public List<String> findStringsInLogsAndTrace(String regexp) throws Exception {
@@ -2697,10 +2697,10 @@ public class LibertyClient {
      * This method will search the output and trace files for this client
      * for the specified expression.
      *
-     * @param  regexp              pattern to search for
-     * @param  traceFileNamePrefix trace file prefix if the trace file name is not default
-     * @return                     A list of the lines in the trace files which contain the matching
-     *                             pattern. No match results in an empty list.
+     * @param regexp              pattern to search for
+     * @param traceFileNamePrefix trace file prefix if the trace file name is not default
+     * @return A list of the lines in the trace files which contain the matching
+     *         pattern. No match results in an empty list.
      * @throws Exception
      */
     /* not called */public List<String> findStringsInLogsAndTrace(String regexp, String traceFileNamePrefix) throws Exception {
@@ -2726,10 +2726,10 @@ public class LibertyClient {
      * This method will search the trace files for this client
      * for the specified expression.
      *
-     * @param  regexp              pattern to search for
-     * @param  traceFileNamePrefix trace file prefix if the trace file name is not default
-     * @return                     A list of the lines in the trace files which contain the matching
-     *                             pattern. No match results in an empty list.
+     * @param regexp              pattern to search for
+     * @param traceFileNamePrefix trace file prefix if the trace file name is not default
+     * @return A list of the lines in the trace files which contain the matching
+     *         pattern. No match results in an empty list.
      * @throws Exception
      */
     public List<String> findStringsInTrace(String regexp) throws Exception {
@@ -2755,9 +2755,9 @@ public class LibertyClient {
      * the file at the offset where the last mark was set (or the beginning of the file
      * if no mark has been set) and reads until the end of the file.
      *
-     * @param  regexp    pattern to search for
-     * @return           A list of the lines in the trace files which contain the matching
-     *                   pattern. No matches result in an empty list.
+     * @param regexp pattern to search for
+     * @return A list of the lines in the trace files which contain the matching
+     *         pattern. No matches result in an empty list.
      * @throws Exception
      */
     public List<String> findStringsInLogsAndTraceUsingMark(String regexp) throws Exception {
@@ -2770,10 +2770,10 @@ public class LibertyClient {
      * file at the offset where the last mark was set (or the beginning of the file
      * if no mark has been set) and reads until the end of the file.
      *
-     * @param  regexp              pattern to search for
-     * @param  traceFileNamePrefix trace file prefix if the trace file name is not default
-     * @return                     A list of the lines in the trace files which contain the matching
-     *                             pattern. No matches result in an empty list.
+     * @param regexp              pattern to search for
+     * @param traceFileNamePrefix trace file prefix if the trace file name is not default
+     * @return A list of the lines in the trace files which contain the matching
+     *         pattern. No matches result in an empty list.
      * @throws Exception
      */
     protected List<String> findStringsInLogsAndTraceUsingMark(String regexp, String traceFileNamePrefix) throws Exception {
@@ -2803,8 +2803,8 @@ public class LibertyClient {
      * at the offset where the last mark was set (or the beginning of the file
      * if no mark has been set) and reads until the end of the file.
      *
-     * @param  regexpList a list of expressions to search for
-     * @return            a <code>List&#60String&#62</code> containing the matches
+     * @param regexpList a list of expressions to search for
+     * @return a <code>List&#60String&#62</code> containing the matches
      * @throws Exception
      */
     public List<String> findStringsInLogsAndTraceUsingMarkMultiRegexp(List<String> regexpList) throws Exception {
@@ -2817,9 +2817,9 @@ public class LibertyClient {
      * at the offset where the last mark was set (or the beginning of the file
      * if no mark has been set) and reads until the end of the file.
      *
-     * @param  regexpList          a list of expressions to search for
-     * @param  traceFileNamePrefix trace file prefix if the trace file name is not default
-     * @return                     a <code>List&#60String&#62</code> contains the matches
+     * @param regexpList          a list of expressions to search for
+     * @param traceFileNamePrefix trace file prefix if the trace file name is not default
+     * @return a <code>List&#60String&#62</code> contains the matches
      * @throws Exception
      */
     protected List<String> findStringsInLogsAndTraceUsingMarkMultiRegexp(List<String> regexpList, String traceFileNamePrefix) throws Exception {
@@ -2903,8 +2903,8 @@ public class LibertyClient {
      * If the file name does not exist in the offsets, then create an entry for it and
      * set the offset for that file to '0'.
      *
-     * @param  String value of the file name
-     * @return        Long containing the offset into the file of the last message inspected
+     * @param String value of the file name
+     * @return Long containing the offset into the file of the last message inspected
      */
     protected Long getLogOffset(String logFile) {
         if (!logOffsets.containsKey(logFile)) {
@@ -2923,9 +2923,9 @@ public class LibertyClient {
     /**
      * Returns a subset of the supplied application names that appear to be installed based on the presence of messages in messages.log.
      *
-     * @param  possiblyInstalledAppNames list of application names to check if installed. The names should be sufficiently unique (not substrings of other names).
-     * @return                           a subset of the supplied application names that appear to be installed based on the presence of messages in messages.log.
-     * @throws Exception                 if an error occurs.
+     * @param possiblyInstalledAppNames list of application names to check if installed. The names should be sufficiently unique (not substrings of other names).
+     * @return a subset of the supplied application names that appear to be installed based on the presence of messages in messages.log.
+     * @throws Exception if an error occurs.
      */
     public Set<String> getInstalledAppNames(String... possiblyInstalledAppNames) throws Exception {
         // Messages for installed/updated:
@@ -2965,11 +2965,11 @@ public class LibertyClient {
      * If a list of application names is supplied, this method waits for all of the apps to be started.
      * The offset is incremented every time this method is called.
      *
-     * @param  appNames optional list of names of applications that should be started before returning from this method.
-     * @param  regexps  optional list of regular expressions that indicate additional messages to wait for. The list should NOT include
-     *                      the CWWKG0017I, CWWKG0018I, CWWKF0007I or CWWKF0007I messages, as those are implicitly handled by this method.
+     * @param appNames optional list of names of applications that should be started before returning from this method.
+     * @param regexps  optional list of regular expressions that indicate additional messages to wait for. The list should NOT include
+     *                     the CWWKG0017I, CWWKG0018I, CWWKF0007I or CWWKF0007I messages, as those are implicitly handled by this method.
      *
-     * @return          list of lines containing relevant messages.
+     * @return list of lines containing relevant messages.
      */
     public List<String> waitForConfigUpdateInLogUsingMark(Set<String> appNames,
                                                           String... regexps) throws Exception {
@@ -2984,14 +2984,14 @@ public class LibertyClient {
      * be waited for. If a list of application names is supplied, this method waits for all of the apps to be started.
      * The offset is incremented every time this method is called.
      *
-     * @param  appNames                      optional list of names of applications that should be started before returning from this method.
-     * @param  waitForFeatureUpdateCompleted if true, this method will require a feature updated completed message
-     *                                           before returning (if false, it will only wait for this message if a feature update is started
-     *                                           before the config update is completed)
-     * @param  regexps                       optional list of regular expressions that indicate additional messages to wait for. The list should NOT include
-     *                                           the CWWKG0017I, CWWKG0018I, CWWKF0007I or CWWKF0007I messages, as those are implicitly handled by this method.
+     * @param appNames                      optional list of names of applications that should be started before returning from this method.
+     * @param waitForFeatureUpdateCompleted if true, this method will require a feature updated completed message
+     *                                          before returning (if false, it will only wait for this message if a feature update is started
+     *                                          before the config update is completed)
+     * @param regexps                       optional list of regular expressions that indicate additional messages to wait for. The list should NOT include
+     *                                          the CWWKG0017I, CWWKG0018I, CWWKF0007I or CWWKF0007I messages, as those are implicitly handled by this method.
      *
-     * @return                               list of lines containing relevant messages.
+     * @return list of lines containing relevant messages.
      */
     public List<String> waitForConfigUpdateInLogUsingMark(Set<String> appNames,
                                                           boolean waitForFeatureUpdateCompleted,
@@ -3102,9 +3102,9 @@ public class LibertyClient {
      * This method will time out after a sensible period of
      * time has elapsed.
      *
-     * @param  regexp a regular expression to search for
-     * @return        the matching line in the log, or null if no matches
-     *                appear before the timeout expires
+     * @param regexp a regular expression to search for
+     * @return the matching line in the log, or null if no matches
+     *         appear before the timeout expires
      */
     public String waitForStringInLog(String regexp) {
         String methodName = "waitForStringInLog()";
@@ -3135,10 +3135,10 @@ public class LibertyClient {
      * This method will time out after a sensible period of
      * time has elapsed.
      *
-     * @param  numberOfMatches number of matches required
-     * @param  regexp          a regular expression to search for
-     * @return                 the number of matches in the log, or 0 if no matches
-     *                         appear before the timeout expires
+     * @param numberOfMatches number of matches required
+     * @param regexp          a regular expression to search for
+     * @return the number of matches in the log, or 0 if no matches
+     *         appear before the timeout expires
      */
     public int waitForMultipleStringsInLog(int numberOfMatches, String regexp) {
         return waitForMultipleStringsInLog(numberOfMatches, regexp, LOG_SEARCH_TIMEOUT);
@@ -3151,9 +3151,9 @@ public class LibertyClient {
      * This method will time out after a sensible period of
      * time has elapsed.
      *
-     * @param  regexp a regular expression to search for
-     * @return        the matching line in the log, or null if no matches
-     *                appear before the timeout expires
+     * @param regexp a regular expression to search for
+     * @return the matching line in the log, or null if no matches
+     *         appear before the timeout expires
      */
     public String waitForStringInLogUsingLastOffset(String regexp) {
         return waitForStringInLogUsingLastOffset(regexp, LOG_SEARCH_TIMEOUT);
@@ -3165,9 +3165,9 @@ public class LibertyClient {
      * This method will time out after a sensible period of
      * time has elapsed.
      *
-     * @param  regexp a regular expression to search for
-     * @return        the matching line in the log, or null if no matches
-     *                appear before the timeout expires
+     * @param regexp a regular expression to search for
+     * @return the matching line in the log, or null if no matches
+     *         appear before the timeout expires
      */
     public String waitForStringInLogUsingMark(String regexp) {
         return waitForStringInLogUsingMark(regexp, LOG_SEARCH_TIMEOUT);
@@ -3179,8 +3179,8 @@ public class LibertyClient {
      * might take a ridiculously long time (like five minutes),
      * consider using the method which takes a default timeout, {@link }
      *
-     * @param  regexp
-     * @param  timeout a timeout, in milliseconds
+     * @param regexp
+     * @param timeout a timeout, in milliseconds
      * @return
      */
     public String waitForStringInLog(String regexp, long timeout) {
@@ -3193,9 +3193,9 @@ public class LibertyClient {
      * might take a ridiculously long time (like five minutes),
      * consider using the method which takes a default timeout.
      *
-     * @param  numberOfMatches number of matches required
-     * @param  regexp          a regular expression to search for
-     * @param  timeout         a timeout, in milliseconds
+     * @param numberOfMatches number of matches required
+     * @param regexp          a regular expression to search for
+     * @param timeout         a timeout, in milliseconds
      * @return
      */
     public int waitForMultipleStringsInLog(int numberOfMatches, String regexp, long timeout) {
@@ -3216,8 +3216,8 @@ public class LibertyClient {
      * might take a ridiculously long time (like five minutes),
      * consider using the method which takes a default timeout, {@link }
      *
-     * @param  regexp
-     * @param  timeout a timeout, in milliseconds
+     * @param regexp
+     * @param timeout a timeout, in milliseconds
      * @return
      */
     public String waitForStringInLogUsingLastOffset(String regexp, long timeout) {
@@ -3237,8 +3237,8 @@ public class LibertyClient {
      * might take a ridiculously long time (like five minutes),
      * consider using the method which takes a default timeout, {@link }
      *
-     * @param  regexp
-     * @param  timeout a timeout, in milliseconds
+     * @param regexp
+     * @param timeout a timeout, in milliseconds
      * @return
      */
     public String waitForStringInLogUsingMark(String regexp, long timeout) {
@@ -3251,8 +3251,8 @@ public class LibertyClient {
     }
 
     /**
-     * @param  regexp
-     * @param  ClientConfigurationFile
+     * @param regexp
+     * @param ClientConfigurationFile
      * @return
      */
     public String waitForStringInCopiedLog(String regexp) {
@@ -3267,8 +3267,8 @@ public class LibertyClient {
     }
 
     /**
-     * @param  regexp
-     * @param  ClientConfigurationFile
+     * @param regexp
+     * @param ClientConfigurationFile
      * @return
      */
     public String waitForStringInLog(String regexp, RemoteFile outputFile) {
@@ -3278,10 +3278,10 @@ public class LibertyClient {
     /**
      * Check for a number of strings in a potentially remote file
      *
-     * @param  regexp     a regular expression to search for
-     * @param  timeout    a timeout, in milliseconds
-     * @param  outputFile file to check
-     * @return            line that matched the regexp
+     * @param regexp     a regular expression to search for
+     * @param timeout    a timeout, in milliseconds
+     * @param outputFile file to check
+     * @return line that matched the regexp
      */
     public String waitForStringInLog(String regexp, long timeout, RemoteFile outputFile) {
         return waitForStringInLogUsingMark(regexp, timeout, outputFile);
@@ -3290,11 +3290,11 @@ public class LibertyClient {
     /**
      * Check for a number of strings in a potentially remote file
      *
-     * @param  numberOfMatches number of matches required
-     * @param  regexp          a regular expression to search for
-     * @param  timeout         a timeout, in milliseconds
-     * @param  outputFile      file to check
-     * @return                 number of matches found
+     * @param numberOfMatches number of matches required
+     * @param regexp          a regular expression to search for
+     * @param timeout         a timeout, in milliseconds
+     * @param outputFile      file to check
+     * @return number of matches found
      */
     public int waitForMultipleStringsInLog(int numberOfMatches, String regexp, long timeout, RemoteFile outputFile) {
         long startTime = System.currentTimeMillis();
@@ -3334,8 +3334,8 @@ public class LibertyClient {
      * Wait for the specified regex in the specified RemoteFile from the last
      * mark.
      *
-     * @param  regexp
-     * @param  outputFile
+     * @param regexp
+     * @param outputFile
      * @return
      */
     public String waitForStringInLogUsingMark(String regexp, RemoteFile outputFile) {
@@ -3346,10 +3346,10 @@ public class LibertyClient {
      * Wait for the specified regexp in the default logs from the last offset.
      * The offset is incremented every time this method is called.
      *
-     * @param  regexp     a regular expression to search for
-     * @param  timeout    a timeout, in milliseconds
-     * @param  outputFile file to check
-     * @return            line that matched the regexp
+     * @param regexp     a regular expression to search for
+     * @param timeout    a timeout, in milliseconds
+     * @param outputFile file to check
+     * @return line that matched the regexp
      */
     protected String waitForStringInLogUsingLastOffset(String regexp, long intendedTimeout, RemoteFile outputFile) {
         return waitForStringInLogUsingLastOffset(regexp, intendedTimeout, 2 * intendedTimeout, outputFile);
@@ -3359,11 +3359,11 @@ public class LibertyClient {
      * Wait for the specified regexp in the default logs from the last offset.
      * The offset is incremented every time this method is called.
      *
-     * @param  regexp          a regular expression to search for
-     * @param  intendedTimeout a timeout, in milliseconds, within which we expect the wait to complete. Missing this is a soft fail.
-     * @param  extendedTimeout a timeout, in milliseconds, within which we insist the wait complete. Missing this is an error.
-     * @param  outputFile      file to check
-     * @return                 line that matched the regexp
+     * @param regexp          a regular expression to search for
+     * @param intendedTimeout a timeout, in milliseconds, within which we expect the wait to complete. Missing this is a soft fail.
+     * @param extendedTimeout a timeout, in milliseconds, within which we insist the wait complete. Missing this is an error.
+     * @param outputFile      file to check
+     * @return line that matched the regexp
      */
     protected String waitForStringInLogUsingLastOffset(String regexp, long intendedTimeout, long extendedTimeout, RemoteFile outputFile) {
         final String METHOD_NAME = "waitForStringInLogUsingLastOffset";
@@ -3416,10 +3416,10 @@ public class LibertyClient {
      * Wait for the specified regexp in the default logs from the last mark.
      * The offset is also incremented every time this method is called.
      *
-     * @param  regexp     a regular expression to search for
-     * @param  timeout    a timeout, in milliseconds
-     * @param  outputFile file to check
-     * @return            line that matched the regexp
+     * @param regexp     a regular expression to search for
+     * @param timeout    a timeout, in milliseconds
+     * @param outputFile file to check
+     * @return line that matched the regexp
      */
     protected String waitForStringInLogUsingMark(String regexp, long intendedTimeout, RemoteFile outputFile) {
         return waitForStringInLogUsingMark(regexp, intendedTimeout, 2 * intendedTimeout, outputFile);
@@ -3429,11 +3429,11 @@ public class LibertyClient {
      * Wait for the specified regexp in the default logs from the last mark.
      * The offset is also incremented every time this method is called.
      *
-     * @param  regexp          a regular expression to search for
-     * @param  intendedTimeout a timeout, in milliseconds, within which the wait should complete. Exceeding this is a soft fail.
-     * @param  extendedTimeout a timeout, in milliseconds, within which the wait must complete. Exceeding this is a hard fail.
-     * @param  outputFile      file to check
-     * @return                 line that matched the regexp
+     * @param regexp          a regular expression to search for
+     * @param intendedTimeout a timeout, in milliseconds, within which the wait should complete. Exceeding this is a soft fail.
+     * @param extendedTimeout a timeout, in milliseconds, within which the wait must complete. Exceeding this is a hard fail.
+     * @param outputFile      file to check
+     * @return line that matched the regexp
      */
     protected String waitForStringInLogUsingMark(String regexp, long intendedTimeout, long extendedTimeout, RemoteFile outputFile) {
         final String METHOD_NAME = "waitForStringInLogUsingMark";
@@ -3482,9 +3482,9 @@ public class LibertyClient {
     /**
      * Check for multiple instances of the regex in log using mark
      *
-     * @param  numberOfMatches number of matches required
-     * @param  regexp          a regular expression to search for
-     * @return                 number of matches found
+     * @param numberOfMatches number of matches required
+     * @param regexp          a regular expression to search for
+     * @return number of matches found
      */
     public int waitForMultipleStringsInLogUsingMark(int numberOfMatches, String regexp) {
         try {
@@ -3498,11 +3498,11 @@ public class LibertyClient {
     /**
      * Check for multiple instances of the regex in log using mark
      *
-     * @param  numberOfMatches number of matches required
-     * @param  regexp          a regular expression to search for
-     * @param  timeout         a timeout, in milliseconds
-     * @param  outputFile      file to check
-     * @return                 number of matches found
+     * @param numberOfMatches number of matches required
+     * @param regexp          a regular expression to search for
+     * @param timeout         a timeout, in milliseconds
+     * @param outputFile      file to check
+     * @return number of matches found
      */
     public int waitForMultipleStringsInLogUsingMark(int numberOfMatches, String regexp, long timeout, RemoteFile outputFile) {
         long startTime = System.currentTimeMillis();
@@ -3554,7 +3554,7 @@ public class LibertyClient {
     /**
      * Wait for a regex in the most recent trace file
      *
-     * @param  regexp
+     * @param regexp
      * @return
      */
     public String waitForStringInTrace(String regexp) {
@@ -3564,7 +3564,7 @@ public class LibertyClient {
     /**
      * Wait for a regex in the most recent trace file
      *
-     * @param  regexp
+     * @param regexp
      * @return
      */
     public String waitForStringInTrace(String regexp, long timeout) {
@@ -3704,8 +3704,8 @@ public class LibertyClient {
     /**
      * Start the client.
      *
-     * @param  cleanStart   if true, the client will be started with a clean start
-     * @param  validateApps if true, block until all of the registered apps have started
+     * @param cleanStart   if true, the client will be started with a clean start
+     * @param validateApps if true, block until all of the registered apps have started
      * @throws Exception
      */
     public ProgramOutput startClient(boolean cleanStart, boolean validateApps) throws Exception {
@@ -3719,8 +3719,8 @@ public class LibertyClient {
      * This will use {@link #waitForStringInLogUsingMark(String)} so ensure
      * the offset is set to the correct point before invoking.
      *
-     * @param  fileName  the file name of the application, e.g. snoop.war
-     * @return           {@code true} if the application was restarted successfully, {@code false} otherwise.
+     * @param fileName the file name of the application, e.g. snoop.war
+     * @return {@code true} if the application was restarted successfully, {@code false} otherwise.
      * @throws Exception
      */
     public boolean restartDropinsApplication(String fileName) throws Exception {
@@ -3767,11 +3767,11 @@ public class LibertyClient {
     /**
      * Start the client and validate that the client was started
      *
-     * @param  cleanStart     if true, the client will be started with a clean start
-     * @param  validateApps   if true, block until all of the registered apps have started
-     * @param  preCleanClient if true, the client directory will be reset before the client is started (reverted to vanilla backup).
+     * @param cleanStart     if true, the client will be started with a clean start
+     * @param validateApps   if true, block until all of the registered apps have started
+     * @param preCleanClient if true, the client directory will be reset before the client is started (reverted to vanilla backup).
      * @throws Exception
-     * @return                the output of the start command
+     * @return the output of the start command
      */
     public ProgramOutput startClientAndValidate(boolean preClean, boolean cleanStart, boolean validateApps) throws Exception {
         return startClientAndValidate(preClean, cleanStart, validateApps, false);
@@ -3780,11 +3780,11 @@ public class LibertyClient {
     /**
      * Start the client and validate that the client was started
      *
-     * @param  cleanStart     if true, the client will be started with a clean start
-     * @param  validateApps   if true, block until all of the registered apps have started
-     * @param  preCleanClient if true, the client directory will be reset before the client is started (reverted to vanilla backup).
+     * @param cleanStart     if true, the client will be started with a clean start
+     * @param validateApps   if true, block until all of the registered apps have started
+     * @param preCleanClient if true, the client directory will be reset before the client is started (reverted to vanilla backup).
      * @throws Exception
-     * @return                the output of the start command
+     * @return the output of the start command
      */
     public ProgramOutput startClientAndValidate(boolean preClean, boolean cleanStart, boolean validateApps, boolean expectStartFailure) throws Exception {
         return startClientAndValidate(preClean, cleanStart, validateApps, expectStartFailure, true);
@@ -3793,13 +3793,13 @@ public class LibertyClient {
     /**
      * Start the client and validate that the client was started
      *
-     * @param  preClean           if true, the client directory will be reset before
-     *                                the client is started (reverted to vanilla backup).
-     * @param  cleanStart         if true, the client will be started with a clean start
-     * @param  validateApps       if true, block until all of the registered apps have started
-     * @param  expectStartFailure if true, a the client is not expected to start
-     *                                due to a failure
-     * @param  validateTimedExit  if true, the client will make sure that timedexit-1.0 is enabled
+     * @param preClean           if true, the client directory will be reset before
+     *                               the client is started (reverted to vanilla backup).
+     * @param cleanStart         if true, the client will be started with a clean start
+     * @param validateApps       if true, block until all of the registered apps have started
+     * @param expectStartFailure if true, a the client is not expected to start
+     *                               due to a failure
+     * @param validateTimedExit  if true, the client will make sure that timedexit-1.0 is enabled
      * @throws Exception
      */
     public ProgramOutput startClientAndValidate(boolean preClean, boolean cleanStart,
@@ -3811,10 +3811,10 @@ public class LibertyClient {
     /**
      * Issues a client script command against this client
      *
-     * @param  command      command name
-     * @param  optionalArgs any optional args needed by the command
-     * @throws Exception    if the operation fails
-     * @return              the output of the command
+     * @param command      command name
+     * @param optionalArgs any optional args needed by the command
+     * @throws Exception if the operation fails
+     * @return the output of the command
      */
     public ProgramOutput executeClientScript(String command, String[] optionalArgs) throws Exception {
         final String method = "executeClientScript";
@@ -3849,8 +3849,8 @@ public class LibertyClient {
     /**
      * Set the list of errors to be ignored
      *
-     * @param  String .... list of expected errors
-     * @return        void
+     * @param String .... list of expected errors
+     * @return void
      */
     public void addIgnoreErrors(String... regex) {
         if (regex != null && regex.length != 0) {

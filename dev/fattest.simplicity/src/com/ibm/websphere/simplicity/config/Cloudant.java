@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 IBM Corporation and others.
+ * Copyright (c) 2016, 2022 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,8 +13,8 @@ package com.ibm.websphere.simplicity.config;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import componenttest.common.apiservices.Bootstrap;
-import componenttest.common.apiservices.BootstrapProperty;
+import com.ibm.websphere.simplicity.Bootstrap;
+import com.ibm.websphere.simplicity.BootstrapProperty;
 
 /**
  * Represents the <cloudant> element in server.xml
@@ -259,8 +259,7 @@ public class Cloudant extends ConfigElement implements ModifiableConfigElement {
             boolean secure = expand(config, getUrl()).startsWith("https");
             String protocol = secure ? "https://" : "http://";
             String hostname = b.getValue(BootstrapProperty.DB_HOSTNAME.getPropertyName());
-            String port = secure ? b.getValue(BootstrapProperty.DB_PORT_SECURE.getPropertyName()) :
-                            b.getValue(BootstrapProperty.DB_PORT.getPropertyName());
+            String port = secure ? b.getValue(BootstrapProperty.DB_PORT_SECURE.getPropertyName()) : b.getValue(BootstrapProperty.DB_PORT.getPropertyName());
             setUrl(protocol + hostname + ':' + port);
         }
 

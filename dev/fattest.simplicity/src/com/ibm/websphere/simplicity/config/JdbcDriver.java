@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 IBM Corporation and others.
+ * Copyright (c) 2017, 2022 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,15 +14,15 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.ibm.websphere.simplicity.Bootstrap;
+import com.ibm.websphere.simplicity.BootstrapProperty;
 import com.ibm.websphere.simplicity.log.Log;
-import componenttest.common.apiservices.Bootstrap;
-import componenttest.common.apiservices.BootstrapProperty;
 
 /**
  * Defines a JDBC driver
- * 
+ *
  * @author Tim Burns
- * 
+ *
  */
 public class JdbcDriver extends ConfigElement implements ModifiableConfigElement {
 
@@ -109,7 +109,7 @@ public class JdbcDriver extends ConfigElement implements ModifiableConfigElement
 
     /**
      * Modifies the element if the fat.modify="true" attribute was configured for this element.
-     * 
+     *
      * @param config The ServerConfiguration instance.
      */
     @Override

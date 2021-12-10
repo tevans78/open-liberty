@@ -13,7 +13,7 @@ package com.ibm.ws.jpa.tests.spec10.injection.ejb_in_war;
 
 import java.io.File;
 
-import componenttest.common.apiservices.Bootstrap;
+import com.ibm.websphere.simplicity.Bootstrap;
 import componenttest.rules.repeater.RepeatTestAction;
 
 /**

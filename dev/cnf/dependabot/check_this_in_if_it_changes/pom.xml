@@ -217,16 +217,6 @@
       <version>2.5.0</version>
     </dependency>
     <dependency>
-      <groupId>com.ibm.ws.componenttest</groupId>
-      <artifactId>provider.api</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.ibm.ws.componenttest</groupId>
-      <artifactId>public.api</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-    <dependency>
       <groupId>com.icegreen</groupId>
       <artifactId>greenmail</artifactId>
       <version>1.5.10</version>

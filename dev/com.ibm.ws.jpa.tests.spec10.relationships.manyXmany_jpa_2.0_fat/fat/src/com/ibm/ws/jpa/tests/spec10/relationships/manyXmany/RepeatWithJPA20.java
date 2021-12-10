@@ -13,7 +13,7 @@ package com.ibm.ws.jpa.tests.spec10.relationships.manyXmany;
 
 import java.io.File;
 
-import componenttest.common.apiservices.Bootstrap;
+import com.ibm.websphere.simplicity.Bootstrap;
 import componenttest.rules.repeater.EE6FeatureReplacementAction;
 import componenttest.rules.repeater.EE8FeatureReplacementAction;
 import componenttest.rules.repeater.FeatureReplacementAction;

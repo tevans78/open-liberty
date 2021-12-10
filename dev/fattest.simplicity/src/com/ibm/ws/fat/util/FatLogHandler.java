@@ -26,7 +26,7 @@ import org.junit.runners.model.Statement;
  * <p>Similarly, when a static variable is annotated {@link org.junit.ClassRule}, JUnit invokes {@link #before()} before any method annotated {@link org.junit.BeforeClass}, and
  * {@link #after()} after any method annotated {@link org.junit.AfterClass}.</p>
  * <p>Note that JUnit invokes {@link #apply(Statement, Description)} before {@link #before()}.</p>
- * 
+ *
  * @see #createLogDirectory(Description)
  * @author Tim Burns
  */
@@ -82,20 +82,20 @@ public class FatLogHandler extends ExternalResource {
      * <p>
      * This method is not thread-safe.
      * </p>
-     * 
+     *
      * @param parent
-     *            the directory where you want to create a new file
+     *                   the directory where you want to create a new file
      * @param prefix
-     *            an optional String that proceeds ordering information. All
-     *            characters must match: [a-zA-Z_0-9\\.]
+     *                   an optional String that proceeds ordering information. All
+     *                   characters must match: [a-zA-Z_0-9\\.]
      * @param digits
-     *            the number of digits to use for generated identifiers
+     *                   the number of digits to use for generated identifiers
      * @param name
-     *            the name of the desired file, without any numeric identifier.
-     *            All characters must match: [a-zA-Z_0-9\\.]
+     *                   the name of the desired file, without any numeric identifier.
+     *                   All characters must match: [a-zA-Z_0-9\\.]
      * @return a new File representing a unique child of the parent
      * @throws IllegalArgumentException
-     *             if input arguments are invalid
+     *                                      if input arguments are invalid
      */
     protected File createOrderedFileInDirectory(File parent, String prefix, int digits, String name) throws IllegalArgumentException {
         if (parent == null) {
@@ -148,15 +148,15 @@ public class FatLogHandler extends ExternalResource {
      * Prepends zeros to the left of the input number to ensure that the input
      * number is a total of <code>width</code> digits. Truncates the input
      * number if it has more than <code>width</code> digits.
-     * 
+     *
      * @param number
-     *            a positive integer (negative integers cause problems with odd
-     *            widths)
+     *                   a positive integer (negative integers cause problems with odd
+     *                   widths)
      * @param width
-     *            the number of characters that you want in a String
-     *            representation of <code>number</code>; must be a positive
-     *            integer smaller than 18 (larger numbers cause an overflow
-     *            issue)
+     *                   the number of characters that you want in a String
+     *                   representation of <code>number</code>; must be a positive
+     *                   integer smaller than 18 (larger numbers cause an overflow
+     *                   issue)
      * @return a zero-padded String representation of the input number
      */
     protected String zeroPad(long number, int width) {
@@ -230,7 +230,7 @@ public class FatLogHandler extends ExternalResource {
 
     /**
      * Defines the directory where logs will be stored for the current test fixture / test case
-     * 
+     *
      * @param description the test fixture currently being applied
      * @return the directory where results from this test fixture should be logged, or null if no valid directory could be found
      */

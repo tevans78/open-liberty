@@ -1,0 +1,71 @@
+/*******************************************************************************
+ * Copyright (c) 2011 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
+
+package com.ibm.websphere.simplicity.commands.profile;
+
+import java.util.Properties;
+import java.util.List;
+import com.ibm.websphere.simplicity.Scope;
+import com.ibm.websphere.simplicity.OperationResults;
+import com.ibm.websphere.simplicity.commands.Command;
+
+/**
+ * NOTE: Please do not use this command unless a Simplicity API does not already exist.
+ * Get the profile key
+ *   'profilePath': Profile path of profile to locate the profile key
+ * The required parameters are found in the constructor.
+ */
+public class GetProfileKey extends Command {
+
+	private String profilePath;
+
+	public GetProfileKey() {
+		super("getProfileKey");
+	}
+
+	/**
+	 * Profile path of profile to locate the profile key
+	 */
+	public String getProfilePath() {
+		return this.profilePath;
+	}
+
+	/**
+	 * Profile path of profile to locate the profile key
+	 */
+	public void setProfilePath(String value) {
+		this.profilePath = value;
+	}
+
+	public Properties __getParameters() {
+		Properties ret = new Properties();
+		if (this.profilePath != null) {
+			ret.put("profilePath", this.profilePath);
+		}
+		return ret;
+	}
+
+	public Object __getTarget() {
+		return null;
+	}
+
+	public List<Command> __getSteps() {
+		return null;
+	}
+
+	/**
+	 * Executes the command against the specified scope.
+	 */
+	public OperationResults<Object> run(Scope scope) throws Exception {
+		return super.run(scope);
+	}
+
+}

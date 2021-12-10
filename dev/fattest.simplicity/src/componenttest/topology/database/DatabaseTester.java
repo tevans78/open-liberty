@@ -10,10 +10,10 @@
  *******************************************************************************/
 package componenttest.topology.database;
 
-import static componenttest.common.apiservices.BootstrapProperty.DB_DRIVERNAME;
-import static componenttest.common.apiservices.BootstrapProperty.DB_DRIVERVERSION;
-import static componenttest.common.apiservices.BootstrapProperty.DB_VENDORNAME;
-import static componenttest.common.apiservices.BootstrapProperty.LIBERTY_DBJARS;
+import static com.ibm.websphere.simplicity.BootstrapProperty.DB_DRIVERNAME;
+import static com.ibm.websphere.simplicity.BootstrapProperty.DB_DRIVERVERSION;
+import static com.ibm.websphere.simplicity.BootstrapProperty.DB_VENDORNAME;
+import static com.ibm.websphere.simplicity.BootstrapProperty.LIBERTY_DBJARS;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,10 +22,9 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Properties;
 
+import com.ibm.websphere.simplicity.Bootstrap;
+import com.ibm.websphere.simplicity.BootstrapProperty;
 import com.ibm.websphere.simplicity.log.Log;
-
-import componenttest.common.apiservices.Bootstrap;
-import componenttest.common.apiservices.BootstrapProperty;
 
 /**
  * <h1>Database Setup and Cleanup</h1>
@@ -174,31 +173,31 @@ public class DatabaseTester {
      * Options for database environment set up and tear down.
      *
      * @param args Set of strings<ul>
-     *            <li>[0] bootstrapping file name
-     *            <li>[1] option
-     *            <br><b>create</b> - create the database and/or user IDs.
-     *            <br>&nbsp;&nbsp;&nbsp;The database or user IDs are NOT created if database.dropandcreate=false
-     *            and the names are provided.
-     *            <br>
-     *            <br><b>drop</b> - drop the database or user IDs.
-     *            <br>&nbsp;&nbsp;&nbsp;The database or user IDs are NOT dropped if database.keepdatabase was added to the
-     *            bootstrapping.properties file during the create option. It is then the tester's responsibility
-     *            to drop the database or user IDs when they are no longer needed.
-     *            <br>
-     *            <br><b>runDDL</b> - execute all DDL files in the ddl directory for the database type
-     *            <br>
-     *            <br><b>startDerbyNet</b> - start Derby Network Server
-     *            <br>
-     *            <br><b>stopDerbyNet</b> - stop Derby Network Server
-     *            <li>[2] test bucket path name
-     *            <li>[3] (optional) database properties/jars directory (i.e. /path/to/prereq.dbtest/lib/DB2 ).
-     *            Omit this parameter to reuse the database information that is stored in bootstrapping.properties
-     *            after a test has previously invoked the create operation.
-     *            <li>[4] (optional) The path to the JDBC driver jar to use. If this argument is null,<br>
-     *            then the database jar will be used from the location specified in arg [3]. Note that if
-     *            the bootstrapping.properties file already has a liberty.db_jars property set, that value
-     *            will always be used and not overridden by arg[3] or arg[4].
-     *            </ul>
+     *                 <li>[0] bootstrapping file name
+     *                 <li>[1] option
+     *                 <br><b>create</b> - create the database and/or user IDs.
+     *                 <br>&nbsp;&nbsp;&nbsp;The database or user IDs are NOT created if database.dropandcreate=false
+     *                 and the names are provided.
+     *                 <br>
+     *                 <br><b>drop</b> - drop the database or user IDs.
+     *                 <br>&nbsp;&nbsp;&nbsp;The database or user IDs are NOT dropped if database.keepdatabase was added to the
+     *                 bootstrapping.properties file during the create option. It is then the tester's responsibility
+     *                 to drop the database or user IDs when they are no longer needed.
+     *                 <br>
+     *                 <br><b>runDDL</b> - execute all DDL files in the ddl directory for the database type
+     *                 <br>
+     *                 <br><b>startDerbyNet</b> - start Derby Network Server
+     *                 <br>
+     *                 <br><b>stopDerbyNet</b> - stop Derby Network Server
+     *                 <li>[2] test bucket path name
+     *                 <li>[3] (optional) database properties/jars directory (i.e. /path/to/prereq.dbtest/lib/DB2 ).
+     *                 Omit this parameter to reuse the database information that is stored in bootstrapping.properties
+     *                 after a test has previously invoked the create operation.
+     *                 <li>[4] (optional) The path to the JDBC driver jar to use. If this argument is null,<br>
+     *                 then the database jar will be used from the location specified in arg [3]. Note that if
+     *                 the bootstrapping.properties file already has a liberty.db_jars property set, that value
+     *                 will always be used and not overridden by arg[3] or arg[4].
+     *                 </ul>
      *
      * @throws Exception see exception for details
      */

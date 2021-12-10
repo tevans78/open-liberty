@@ -14,10 +14,10 @@ import java.io.File;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import com.ibm.websphere.simplicity.Bootstrap;
+import com.ibm.websphere.simplicity.BootstrapProperty;
 import com.ibm.websphere.simplicity.ProgramOutput;
 import com.ibm.websphere.simplicity.log.Log;
-import componenttest.common.apiservices.Bootstrap;
-import componenttest.common.apiservices.BootstrapProperty;
 
 /**
  * Sybase database setup.
@@ -52,8 +52,7 @@ public class SybaseDatabase extends Database {
             Log.info(c, method, "Use specified database name: " + dbname);
             String db_dropandcreate = bootstrap.getValue(BootstrapProperty.DB_DROPANDCREATE.getPropertyName());
             Log.info(c, method, "Drop and create set to: " + db_dropandcreate);
-            boolean dropandcreate = db_dropandcreate == null
-                            ? false : db_dropandcreate.equalsIgnoreCase("true") ? true : false;
+            boolean dropandcreate = db_dropandcreate == null ? false : db_dropandcreate.equalsIgnoreCase("true") ? true : false;
             Log.info(c, method, "Drop and create is: " + dropandcreate);
             if (dropandcreate) {
                 Log.info(c, method, "Dropping and creating database");

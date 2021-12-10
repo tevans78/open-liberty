@@ -1,0 +1,90 @@
+/*******************************************************************************
+ * Copyright (c) 2011 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
+
+package com.ibm.websphere.simplicity.commands.scope;
+
+import java.util.Properties;
+import java.util.List;
+import com.ibm.websphere.simplicity.Scope;
+import com.ibm.websphere.simplicity.OperationResults;
+import com.ibm.websphere.simplicity.commands.Command;
+
+/**
+ * NOTE: Please do not use this command unless a Simplicity API does not already exist.
+ * Create a management scope.
+ *   'scopeName': Specifies the management scope.
+ *   'scopeType': Specifies the management scope type.
+ * The required parameters are found in the constructor.
+ */
+public class CreateManagementScope extends Command {
+
+	private String scopeName;
+	private String scopeType;
+
+	public CreateManagementScope() {
+		super("createManagementScope");
+	}
+
+	/**
+	 * Specifies the management scope.
+	 */
+	public String getScopeName() {
+		return this.scopeName;
+	}
+
+	/**
+	 * Specifies the management scope.
+	 */
+	public void setScopeName(String value) {
+		this.scopeName = value;
+	}
+
+	/**
+	 * Specifies the management scope type.
+	 */
+	public String getScopeType() {
+		return this.scopeType;
+	}
+
+	/**
+	 * Specifies the management scope type.
+	 */
+	public void setScopeType(String value) {
+		this.scopeType = value;
+	}
+
+	public Properties __getParameters() {
+		Properties ret = new Properties();
+		if (this.scopeName != null) {
+			ret.put("scopeName", this.scopeName);
+		}
+		if (this.scopeType != null) {
+			ret.put("scopeType", this.scopeType);
+		}
+		return ret;
+	}
+
+	public Object __getTarget() {
+		return null;
+	}
+
+	public List<Command> __getSteps() {
+		return null;
+	}
+
+	/**
+	 * Executes the command against the specified scope.
+	 */
+	public OperationResults<Object> run(Scope scope) throws Exception {
+		return super.run(scope);
+	}
+
+}

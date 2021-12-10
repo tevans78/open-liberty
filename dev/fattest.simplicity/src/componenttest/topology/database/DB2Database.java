@@ -14,11 +14,11 @@ import java.io.File;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import com.ibm.websphere.simplicity.Bootstrap;
+import com.ibm.websphere.simplicity.BootstrapProperty;
 import com.ibm.websphere.simplicity.OperatingSystem;
 import com.ibm.websphere.simplicity.ProgramOutput;
 import com.ibm.websphere.simplicity.log.Log;
-import componenttest.common.apiservices.Bootstrap;
-import componenttest.common.apiservices.BootstrapProperty;
 
 /**
  * DB2 database setup.
@@ -51,8 +51,7 @@ public class DB2Database extends Database {
             Log.info(c, method, "Use specified database name: " + dbname);
             String db_dropandcreate = bootstrap.getValue(BootstrapProperty.DB_DROPANDCREATE.getPropertyName());
             Log.info(c, method, "Drop and create set to: " + db_dropandcreate);
-            boolean dropandcreate = db_dropandcreate == null
-                            ? false : db_dropandcreate.equalsIgnoreCase("true") ? true : false;
+            boolean dropandcreate = db_dropandcreate == null ? false : db_dropandcreate.equalsIgnoreCase("true") ? true : false;
             Log.info(c, method, "Drop and create is: " + dropandcreate);
             if (dropandcreate) {
                 Log.info(c, method, "Dropping and creating database");
@@ -99,8 +98,7 @@ public class DB2Database extends Database {
                 String[] cmd = new String[10];
                 String db2cmd = null;
                 int numcmdlines = 0;
-                if (databaseMachine.getOperatingSystem().equals(OperatingSystem.WINDOWS))
-                {
+                if (databaseMachine.getOperatingSystem().equals(OperatingSystem.WINDOWS)) {
                     db2cmd = "db2cmd -c -w -i ";
                     // build a file to pass to db2cmd
                     cmd[numcmdlines++] = "echo \"" + "connect to " + dbname + " user " + dbuser1 + " using " + dbuser1pwd + ";\" > " + runDDLFile;
@@ -124,7 +122,7 @@ public class DB2Database extends Database {
                     // In case debugging is needed, displaying the message in stdout
                     //
                     // DROP TABLE MYJOBINSTANCEDATA1
-                    // DB21034E  The command was processed as an SQL statement because it was not a 
+                    // DB21034E  The command was processed as an SQL statement because it was not a
                     // valid Command Line Processor command.  During SQL processing it returned:
                     // SQL0204N  "DB2ADMIN.MYJOBINSTANCEDATA1" is an undefined name.  SQLSTATE=42704
                     if (result.getReturnCode() != 0
