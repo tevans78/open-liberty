@@ -47,7 +47,7 @@ import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebRequest;
 
-import com.ibm.websphere.simplicity.Bootstrap;
+import componenttest.common.apiservices.Bootstrap;
 import componenttest.topology.impl.LibertyFileManager;
 import componenttest.topology.utils.LDAPUtils;
 

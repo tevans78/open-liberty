@@ -15,9 +15,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import com.ibm.websphere.simplicity.Bootstrap;
 import com.ibm.websphere.simplicity.log.Log;
 
+import componenttest.common.apiservices.Bootstrap;
 import componenttest.topology.utils.PrivHelper;
 
 /**

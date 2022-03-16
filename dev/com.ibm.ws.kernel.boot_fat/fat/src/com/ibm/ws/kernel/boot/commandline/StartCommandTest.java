@@ -21,7 +21,7 @@ import org.junit.Test;
 import com.ibm.websphere.simplicity.Machine;
 import com.ibm.websphere.simplicity.ProgramOutput;
 
-import com.ibm.websphere.simplicity.Bootstrap;
+import componenttest.common.apiservices.Bootstrap;
 import componenttest.topology.impl.LibertyFileManager;
 import componenttest.topology.utils.LibertyServerUtils;
 

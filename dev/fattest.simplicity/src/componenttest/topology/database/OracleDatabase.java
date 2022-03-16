@@ -14,14 +14,13 @@ import java.io.File;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-import com.ibm.websphere.simplicity.Bootstrap;
-import com.ibm.websphere.simplicity.BootstrapProperty;
 import com.ibm.websphere.simplicity.ProgramOutput;
 import com.ibm.websphere.simplicity.config.ConfigElementList;
 import com.ibm.websphere.simplicity.config.ServerConfiguration;
 import com.ibm.websphere.simplicity.config.Variable;
 import com.ibm.websphere.simplicity.log.Log;
-
+import componenttest.common.apiservices.Bootstrap;
+import componenttest.common.apiservices.BootstrapProperty;
 import componenttest.topology.impl.LibertyServer;
 
 /**
@@ -70,7 +69,8 @@ public class OracleDatabase extends Database {
             Log.info(c, method, "Use specified user name: " + dbuser_names[1]);
             String db_dropandcreate = bootstrap.getValue(BootstrapProperty.DB_DROPANDCREATE.getPropertyName());
             Log.info(c, method, "Drop and create set to: " + db_dropandcreate);
-            boolean dropandcreate = db_dropandcreate == null ? false : db_dropandcreate.equalsIgnoreCase("true") ? true : false;
+            boolean dropandcreate = db_dropandcreate == null
+                            ? false : db_dropandcreate.equalsIgnoreCase("true") ? true : false;
             Log.info(c, method, "Drop and create is: " + dropandcreate);
             if (dropandcreate) {
                 Log.info(c, method, "Dropping and creating schemas");
@@ -213,7 +213,7 @@ public class OracleDatabase extends Database {
             Log.finer(c, method, "execute line " + cmd[cmdline]);
             ProgramOutput result = databaseMachine.execute(cmd[cmdline]);
             // Oracle sqlplus command always returns zero for return code, so need to check the stdout
-            // Check the return code for the other commands
+            // Check the return code for the other commands            
             if (result.getStdout().contains("ORA-") || result.getReturnCode() != 0) {
                 Log.info(c, method, "Create schema returncode: " + result.getReturnCode());
                 Log.info(c, method, "Create schema stdout: " + result.getStdout());

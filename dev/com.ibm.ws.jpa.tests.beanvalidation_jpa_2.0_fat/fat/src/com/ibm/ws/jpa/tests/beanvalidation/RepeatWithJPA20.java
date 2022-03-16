@@ -13,9 +13,9 @@ package com.ibm.ws.jpa.tests.beanvalidation;
 
 import java.io.File;
 
-import com.ibm.websphere.simplicity.Bootstrap;
 import com.ibm.ws.testtooling.jpaprovider.JPAPersistenceProvider;
 
+import componenttest.common.apiservices.Bootstrap;
 import componenttest.rules.repeater.RepeatTestAction;
 
 /**

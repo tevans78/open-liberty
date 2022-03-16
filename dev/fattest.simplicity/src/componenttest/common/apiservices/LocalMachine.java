@@ -8,14 +8,20 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.ibm.websphere.simplicity;
+package componenttest.common.apiservices;
 
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.Properties;
 
+import com.ibm.websphere.simplicity.AsyncProgramOutput;
+import com.ibm.websphere.simplicity.ConnectionInfo;
+import com.ibm.websphere.simplicity.Machine;
+import com.ibm.websphere.simplicity.OperatingSystem;
+import com.ibm.websphere.simplicity.ProgramOutput;
+import com.ibm.websphere.simplicity.RemoteFile;
 import com.ibm.websphere.simplicity.log.Log;
-import com.ibm.websphere.simplicity.provider.commandline.local.LocalProvider;
+import componenttest.common.apiservices.cmdline.LocalProvider;
 
 public class LocalMachine extends Machine {
 
@@ -39,12 +45,10 @@ public class LocalMachine extends Machine {
     }
 
     @Override
-    public void connect() throws Exception {
-    }
+    public void connect() throws Exception {}
 
     @Override
-    public void disconnect() throws Exception {
-    }
+    public void disconnect() throws Exception {}
 
     @Override
     public ProgramOutput execute(String cmd, String[] parameters,
@@ -102,7 +106,7 @@ public class LocalMachine extends Machine {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see componenttest.common.apiservices.Machine#killProcess(int)
      */
     @Override
@@ -127,7 +131,7 @@ public class LocalMachine extends Machine {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see componenttest.common.apiservices.Machine#getDate()
      */
     @Override

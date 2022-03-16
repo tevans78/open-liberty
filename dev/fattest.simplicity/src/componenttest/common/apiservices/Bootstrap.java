@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.ibm.websphere.simplicity;
+package componenttest.common.apiservices;
 
 import java.io.File;
 import java.io.FileInputStream;

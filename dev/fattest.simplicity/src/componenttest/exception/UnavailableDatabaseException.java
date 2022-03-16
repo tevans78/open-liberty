@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package componenttest.topology.database;
+package componenttest.exception;
 
 public class UnavailableDatabaseException extends Exception {
 

@@ -14,9 +14,10 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import com.ibm.websphere.simplicity.Bootstrap;
-import com.ibm.websphere.simplicity.BootstrapProperty;
 import com.ibm.websphere.simplicity.log.Log;
+
+import componenttest.common.apiservices.Bootstrap;
+import componenttest.common.apiservices.BootstrapProperty;
 
 /**
  * Defines a JDBC driver

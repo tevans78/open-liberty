@@ -26,9 +26,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import com.ibm.websphere.simplicity.log.Log;
-//open-liberty uses 'LocalProvider', where-as WS-CD-Open uses 'RXAProvider'.
-import com.ibm.websphere.simplicity.provider.commandline.local.LocalProvider;
 
+import componenttest.common.apiservices.cmdline.LocalProvider;
 import componenttest.topology.impl.LibertyServer;
 
 /**

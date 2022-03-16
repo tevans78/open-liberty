@@ -12,9 +12,10 @@ package com.ibm.websphere.simplicity.config;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
-import com.ibm.websphere.simplicity.Bootstrap;
-import com.ibm.websphere.simplicity.BootstrapProperty;
 import com.ibm.websphere.simplicity.log.Log;
+
+import componenttest.common.apiservices.Bootstrap;
+import componenttest.common.apiservices.BootstrapProperty;
 
 /**
  * An authData element for holding usernames and passwords

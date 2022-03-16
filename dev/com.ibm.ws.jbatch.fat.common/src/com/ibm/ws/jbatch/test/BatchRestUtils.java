@@ -66,8 +66,6 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.util.EntityUtils;
 
-import com.ibm.websphere.simplicity.Bootstrap;
-import com.ibm.websphere.simplicity.BootstrapProperty;
 import com.ibm.websphere.simplicity.Machine;
 import com.ibm.websphere.simplicity.OperatingSystem;
 import com.ibm.websphere.simplicity.config.ConfigElementList;
@@ -80,6 +78,8 @@ import com.ibm.websphere.simplicity.log.Log;
 import com.ibm.ws.common.internal.encoder.Base64Coder;
 import com.ibm.ws.jbatch.test.dbservlet.DbServletClient;
 
+import componenttest.common.apiservices.Bootstrap;
+import componenttest.common.apiservices.BootstrapProperty;
 import componenttest.topology.impl.LibertyServer;
 import componenttest.topology.utils.HttpUtils;
 import componenttest.topology.utils.HttpUtils.HTTPRequestMethod;

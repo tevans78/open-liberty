@@ -24,12 +24,12 @@ import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
-import com.ibm.websphere.simplicity.Bootstrap;
 import com.ibm.websphere.simplicity.Machine;
 import com.ibm.websphere.simplicity.ProgramOutput;
 import com.ibm.websphere.simplicity.RemoteFile;
 import com.ibm.websphere.simplicity.log.Log;
 
+import componenttest.common.apiservices.Bootstrap;
 import componenttest.topology.impl.LibertyClient;
 import componenttest.topology.impl.LibertyClientFactory;
 import componenttest.topology.impl.LibertyServer;

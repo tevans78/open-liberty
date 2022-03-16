@@ -34,6 +34,8 @@ import com.ibm.websphere.simplicity.RemoteFile;
 import com.ibm.websphere.simplicity.log.Log;
 import com.ibm.websphere.simplicity.provider.commandline.CommandLineProvider;
 
+import componenttest.common.apiservices.cmdline.StreamGobbler;
+
 public class LocalCommandLineProvider extends CommandLineProvider {
 
     private static final Class<?> c = LocalCommandLineProvider.class;

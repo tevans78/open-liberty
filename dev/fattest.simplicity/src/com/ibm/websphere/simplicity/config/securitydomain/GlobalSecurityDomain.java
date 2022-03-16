@@ -26,34 +26,36 @@ import com.ibm.websphere.simplicity.provider.websphere.config.securitydomain.Act
  * customize the security policies for user applications.
  */
 public class GlobalSecurityDomain extends SecurityDomain {
-    
+
     private static final Class<?> c = GlobalSecurityDomain.class;
     private Boolean securityEnabled; // needed for topology caching
-    
+
     /**
      * Constructor
-     * 
-     * @param cell The {@link Cell} that the domain belongs to
+     *
+     * @param cell   The {@link Cell} that the domain belongs to
      * @param parent The parent {@link SecurityConfiguration} class
      */
     public GlobalSecurityDomain(Cell cell, SecurityConfiguration parent) {
         super(cell, parent);
     }
-    
+
     /**
      * Get whether or not global security is currently enabled in the configuration.
-     * 
-     * @return true if global security is enabled
+     *
+     * @return           true if global security is enabled
      * @throws Exception
      */
     public boolean isGlobalSecurityEnabled() throws Exception {
-        if(this.securityEnabled == null) {
+        if (this.securityEnabled == null) {
             // first try to read it from the cache
             if (Topology.isTopologyCachingEnabled()) {
-                String value = Topology.getBootstrapFileOps().getConfigurationProvider().getProperty(
-                        cell.getBootstrapFileKey() + BootStrappingFileOperations.SEP + BootStrappingFileOperations.DATA
-                                + BootStrappingFileOperations.SEP + BootStrappingProperty.SECURITY_ENABLED);
-                if(value != null) {
+                String value = Topology.getBootstrapFileOps()
+                                .getConfigurationProvider()
+                                .getProperty(
+                                             cell.getBootstrapFileKey() + BootStrappingFileOperations.SEP + BootStrappingFileOperations.DATA
+                                             + BootStrappingFileOperations.SEP + BootStrappingProperty.SECURITY_ENABLED);
+                if (value != null) {
                     this.securityEnabled = new Boolean(value);
                 } else {
                     // get it from the active security settings
@@ -71,7 +73,7 @@ public class GlobalSecurityDomain extends SecurityDomain {
      * Enable administrative security for this application server domain. Administrative security
      * requires users to authenticate before obtaining administrative control of the application
      * server.
-     * 
+     *
      * @throws Exception
      */
     public void enableAdministrativeSecurity() throws Exception {
@@ -81,7 +83,7 @@ public class GlobalSecurityDomain extends SecurityDomain {
         settings.setEnableGlobalSecurity(true);
         super.applyActiveSecuritySettings(settings);
         this.securityEnabled = true;
-        if(Topology.isTopologyCachingEnabled())
+        if (Topology.isTopologyCachingEnabled())
             Topology.getBootstrapFileOps().clearCache(this.cell);
         Log.entering(c, method);
     }
@@ -90,7 +92,7 @@ public class GlobalSecurityDomain extends SecurityDomain {
      * Diable administrative security for this application server domain. Administrative security
      * requires users to authenticate before obtaining administrative control of the application
      * server.
-     * 
+     *
      * @throws Exception
      */
     public void disableAdministrativeSecurity() throws Exception {
@@ -100,25 +102,25 @@ public class GlobalSecurityDomain extends SecurityDomain {
         settings.setEnableGlobalSecurity(false);
         super.applyActiveSecuritySettings(settings);
         this.securityEnabled = false;
-        if(Topology.isTopologyCachingEnabled())
+        if (Topology.isTopologyCachingEnabled())
             Topology.getBootstrapFileOps().clearCache(this.cell);
         Log.entering(c, method);
     }
-    
+
     /**
      * Get the current active authentication mechanism. Ex: LTPA
-     * 
-     * @return The currently active authentication mechanism
+     *
+     * @return           The currently active authentication mechanism
      * @throws Exception
      */
     public String getActiveAuthMechanism() throws Exception {
-    	final String method = "getActiveAuthMechanism";
-    	Log.entering(c, method);
-    	
-    	String activeAuthMech = getActiveSecuritySettings().getActiveAuthMechanism();
-    	
-    	Log.exiting(c, method, activeAuthMech);
-    	return activeAuthMech;
+        final String method = "getActiveAuthMechanism";
+        Log.entering(c, method);
+
+        String activeAuthMech = getActiveSecuritySettings().getActiveAuthMechanism();
+
+        Log.exiting(c, method, activeAuthMech);
+        return activeAuthMech;
     }
-    
+
 }

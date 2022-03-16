@@ -22,7 +22,10 @@ import com.ibm.websphere.simplicity.log.Log;
 import com.ibm.websphere.simplicity.provider.commandline.CommandLineProvider;
 import com.ibm.websphere.simplicity.provider.commandline.RemoteCommandFactory;
 import com.ibm.websphere.simplicity.provider.commandline.local.LocalCommandLineProvider;
-import com.ibm.websphere.simplicity.provider.commandline.local.LocalProvider;
+
+import componenttest.common.apiservices.Bootstrap;
+import componenttest.common.apiservices.LocalMachine;
+import componenttest.common.apiservices.cmdline.LocalProvider;
 
 /**
  * This class represents a physical machine. This might be a standalone machine or one that has

@@ -17,8 +17,6 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import com.ibm.websphere.simplicity.Bootstrap;
-import com.ibm.websphere.simplicity.BootstrapProperty;
 import com.ibm.websphere.simplicity.config.dsprops.Properties;
 import com.ibm.websphere.simplicity.config.dsprops.Properties_datadirect_sqlserver;
 import com.ibm.websphere.simplicity.config.dsprops.Properties_db2_i_native;
@@ -34,6 +32,9 @@ import com.ibm.websphere.simplicity.config.dsprops.Properties_oracle_ucp;
 import com.ibm.websphere.simplicity.config.dsprops.Properties_postgresql;
 import com.ibm.websphere.simplicity.config.dsprops.Properties_sybase;
 import com.ibm.websphere.simplicity.log.Log;
+
+import componenttest.common.apiservices.Bootstrap;
+import componenttest.common.apiservices.BootstrapProperty;
 
 /**
  * Defines a data source in the server configuration

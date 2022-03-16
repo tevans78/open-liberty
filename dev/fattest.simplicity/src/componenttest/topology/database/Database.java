@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2022 IBM Corporation and others.
+ * Copyright (c) 2014, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,20 +10,20 @@
  *******************************************************************************/
 package componenttest.topology.database;
 
-import static com.ibm.websphere.simplicity.BootstrapProperty.DB_DBAPASSWORD;
-import static com.ibm.websphere.simplicity.BootstrapProperty.DB_DBAUSER;
-import static com.ibm.websphere.simplicity.BootstrapProperty.DB_HOME;
-import static com.ibm.websphere.simplicity.BootstrapProperty.DB_HOSTNAME;
-import static com.ibm.websphere.simplicity.BootstrapProperty.DB_MACHINEPWD;
-import static com.ibm.websphere.simplicity.BootstrapProperty.DB_MACHINEUSER;
-import static com.ibm.websphere.simplicity.BootstrapProperty.DB_NAME;
-import static com.ibm.websphere.simplicity.BootstrapProperty.DB_PASSWORD1;
-import static com.ibm.websphere.simplicity.BootstrapProperty.DB_PASSWORD2;
-import static com.ibm.websphere.simplicity.BootstrapProperty.DB_PORT;
-import static com.ibm.websphere.simplicity.BootstrapProperty.DB_USER1;
-import static com.ibm.websphere.simplicity.BootstrapProperty.DB_USER2;
-import static com.ibm.websphere.simplicity.BootstrapProperty.DB_VENDORNAME;
-import static com.ibm.websphere.simplicity.BootstrapProperty.DB_VENDORVERSION;
+import static componenttest.common.apiservices.BootstrapProperty.DB_DBAPASSWORD;
+import static componenttest.common.apiservices.BootstrapProperty.DB_DBAUSER;
+import static componenttest.common.apiservices.BootstrapProperty.DB_HOME;
+import static componenttest.common.apiservices.BootstrapProperty.DB_HOSTNAME;
+import static componenttest.common.apiservices.BootstrapProperty.DB_MACHINEPWD;
+import static componenttest.common.apiservices.BootstrapProperty.DB_MACHINEUSER;
+import static componenttest.common.apiservices.BootstrapProperty.DB_NAME;
+import static componenttest.common.apiservices.BootstrapProperty.DB_PASSWORD1;
+import static componenttest.common.apiservices.BootstrapProperty.DB_PASSWORD2;
+import static componenttest.common.apiservices.BootstrapProperty.DB_PORT;
+import static componenttest.common.apiservices.BootstrapProperty.DB_USER1;
+import static componenttest.common.apiservices.BootstrapProperty.DB_USER2;
+import static componenttest.common.apiservices.BootstrapProperty.DB_VENDORNAME;
+import static componenttest.common.apiservices.BootstrapProperty.DB_VENDORVERSION;
 
 import java.io.File;
 import java.util.Arrays;
@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import com.ibm.websphere.simplicity.Bootstrap;
-import com.ibm.websphere.simplicity.BootstrapProperty;
 import com.ibm.websphere.simplicity.ConnectionInfo;
 import com.ibm.websphere.simplicity.Machine;
 import com.ibm.websphere.simplicity.RemoteFile;
@@ -41,6 +39,9 @@ import com.ibm.websphere.simplicity.config.ServerConfiguration;
 import com.ibm.websphere.simplicity.config.Variable;
 import com.ibm.websphere.simplicity.log.Log;
 
+import componenttest.common.apiservices.Bootstrap;
+import componenttest.common.apiservices.BootstrapProperty;
+import componenttest.exception.UnavailableDatabaseException;
 import componenttest.topology.impl.LibertyServer;
 
 /**
@@ -111,7 +112,7 @@ public abstract class Database {
      *
      * @param bootstrap Contents of the bootstrapping.properties file.
      * @throws Exception If the database or user IDs could not be created. This may be due to problems with the
-     *                       database or because of collisions with other running test buckets selecting the same names.
+     *             database or because of collisions with other running test buckets selecting the same names.
      */
     final public void createDatabase() throws Exception {
         final String method = "createDatabase";

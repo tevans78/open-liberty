@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.ibm.websphere.simplicity.provider.commandline.local;
+package componenttest.common.apiservices.cmdline;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

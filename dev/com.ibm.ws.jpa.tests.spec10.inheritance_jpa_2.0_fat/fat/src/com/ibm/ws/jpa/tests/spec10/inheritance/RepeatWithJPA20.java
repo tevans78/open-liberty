@@ -13,8 +13,7 @@ package com.ibm.ws.jpa.tests.spec10.inheritance;
 
 import java.io.File;
 
-import com.ibm.websphere.simplicity.Bootstrap;
-
+import componenttest.common.apiservices.Bootstrap;
 import componenttest.rules.repeater.EE6FeatureReplacementAction;
 import componenttest.rules.repeater.EE8FeatureReplacementAction;
 import componenttest.rules.repeater.FeatureReplacementAction;

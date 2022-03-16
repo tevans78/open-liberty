@@ -22,13 +22,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.prefs.Preferences;
 
-import com.ibm.websphere.simplicity.Bootstrap;
 import com.ibm.websphere.simplicity.LocalFile;
 import com.ibm.websphere.simplicity.Machine;
 import com.ibm.websphere.simplicity.ProgramOutput;
 import com.ibm.websphere.simplicity.RemoteFile;
 import com.ibm.websphere.simplicity.log.Log;
 
+import componenttest.common.apiservices.Bootstrap;
 import componenttest.exception.TopologyException;
 import componenttest.topology.utils.PrivHelper;
 
@@ -49,7 +49,7 @@ public class LibertyServerFactory {
     /**
      * This method will return a newly created LibertyServer instance with the specified server name
      *
-     * @return A stopped Liberty Server instance
+     * @return           A stopped Liberty Server instance
      * @throws Exception
      */
     public static LibertyServer getLibertyServer(String serverName) {
@@ -59,9 +59,9 @@ public class LibertyServerFactory {
     /**
      * This method will return a newly created LibertyServer instance with the specified server name
      *
-     * @param serverName    The name of the server
-     * @param testClassName The name of the class to associate with the server.
-     * @return A stopped Liberty Server instance
+     * @param  serverName    The name of the server
+     * @param  testClassName The name of the class to associate with the server.
+     * @return               A stopped Liberty Server instance
      */
     public static LibertyServer getLibertyServer(String serverName, Class<?> testClass) {
         return getLibertyServer(serverName, null, true, false, false, testClass.getCanonicalName());
@@ -72,7 +72,7 @@ public class LibertyServerFactory {
      * Note if the ignoreCache parameter is set to false, then the returned LibertyServer instance may
      * not be newly-created.
      *
-     * @return A stopped Liberty Server instance
+     * @return           A stopped Liberty Server instance
      * @throws Exception
      */
     public static LibertyServer getLibertyServer(String serverName, Bootstrap bootstrap, boolean ignoreCache) {
@@ -217,8 +217,7 @@ public class LibertyServerFactory {
         synchronized (systemErr) {
             System.setErr(new PrintStream(new OutputStream() {
                 @Override
-                public void write(int i) throws IOException {
-                }
+                public void write(int i) throws IOException {}
             }));
             try {
                 Long time = new Long(System.currentTimeMillis());
@@ -264,7 +263,7 @@ public class LibertyServerFactory {
     /**
      * This method will return a newly created LibertyServer instance with the specified server name
      *
-     * @return A started Liberty Server instance
+     * @return           A started Liberty Server instance
      * @throws Exception
      */
     public static LibertyServer getStartedLibertyServer(String serverName) {
@@ -283,12 +282,12 @@ public class LibertyServerFactory {
      * server XML, that includes fatTestPorts.xml and the sample server.xml. The bootstrap.properties will be exchanged with a default properties file that includes the
      * "../testports.properties" file and the sample properties file. The server will then be added to the list of known servers and returned.
      *
-     * @param serverName  The name of the server to install, must be matched by a local file named serverName.jar in the lib/LibertyFATTestFiles folder (populated from
-     *                        publish/files
-     *                        in a FAT test project)
-     * @param bootstrap   The bootstrap to use on the server
-     * @param ignoreCache <code>false</code> if we should load a cached server if available
-     * @return The server
+     * @param  serverName  The name of the server to install, must be matched by a local file named serverName.jar in the lib/LibertyFATTestFiles folder (populated from
+     *                         publish/files
+     *                         in a FAT test project)
+     * @param  bootstrap   The bootstrap to use on the server
+     * @param  ignoreCache <code>false</code> if we should load a cached server if available
+     * @return             The server
      *
      */
     public static LibertyServer installSampleServer(String serverName, Bootstrap bootstrap, boolean ignoreCache) {
@@ -309,7 +308,7 @@ public class LibertyServerFactory {
      * This will happen in the case of FATSuite being the entry point with
      * multiple test classes.
      *
-     * @param testClassName, the name of the test class for which servers should be tidied
+     * @param  testClassName, the name of the test class for which servers should be tidied
      * @throws Exception
      */
     public static void tidyAllKnownServers(String testClassName) throws Exception {
@@ -345,7 +344,7 @@ public class LibertyServerFactory {
      * This method should not be ran by the user, it is ran by the JUnit runner at the end of each test
      * to recover the servers.
      *
-     * @param testClassName the name of the FAT test class to recover known servers for
+     * @param  testClassName the name of the FAT test class to recover known servers for
      * @throws Exception
      */
     public static void recoverAllServers(String testClassName) throws Exception {

@@ -31,13 +31,14 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import com.ibm.websphere.simplicity.Bootstrap;
-import com.ibm.websphere.simplicity.BootstrapProperty;
 import com.ibm.websphere.simplicity.config.ConfigElementList;
 import com.ibm.websphere.simplicity.config.ServerConfiguration;
 import com.ibm.websphere.simplicity.config.Variable;
 import com.ibm.websphere.simplicity.log.Log;
 
+import componenttest.common.apiservices.Bootstrap;
+import componenttest.common.apiservices.BootstrapProperty;
+import componenttest.exception.UnavailableDatabaseException;
 import componenttest.topology.impl.LibertyServer;
 
 /**
@@ -341,12 +342,10 @@ public class CloudantDatabase extends Database {
                 }
 
                 @Override
-                public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                }
+                public void checkClientTrusted(X509Certificate[] certs, String authType) {}
 
                 @Override
-                public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                }
+                public void checkServerTrusted(X509Certificate[] certs, String authType) {}
             } };
             try {
                 SSLContext sc = SSLContext.getInstance("TLSv1");

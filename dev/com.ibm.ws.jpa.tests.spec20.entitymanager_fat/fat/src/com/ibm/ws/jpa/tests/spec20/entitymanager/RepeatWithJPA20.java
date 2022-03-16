@@ -15,7 +15,7 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.ibm.websphere.simplicity.Bootstrap;
+import componenttest.common.apiservices.Bootstrap;
 import componenttest.rules.repeater.EE7FeatureReplacementAction;
 import componenttest.rules.repeater.FeatureReplacementAction;
 

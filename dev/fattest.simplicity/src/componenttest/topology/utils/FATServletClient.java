@@ -29,6 +29,7 @@ import com.ibm.websphere.simplicity.config.dsprops.testrules.DataSourcePropertie
 import com.ibm.websphere.simplicity.log.Log;
 
 import componenttest.app.AssertionErrorSerializer;
+import componenttest.app.FATServlet;
 import componenttest.custom.junit.runner.RepeatTestFilter;
 import componenttest.topology.impl.LibertyServer;
 
@@ -97,8 +98,8 @@ public class FATServletClient {
      * The response string must contain some JSON that represents a serialized AssertionError.
      * The JSON String is wrapped by START_TAG and END_TAG
      *
-     * @param response The response String that contains the serialized AssertionError as json
-     * @return an instance of AssertionError
+     * @param  response              The response String that contains the serialized AssertionError as json
+     * @return                       an instance of AssertionError
      * @throws IllegalStateException if the START_TAG or END_TAG can not be found in the response string
      */
     private static AssertionError parseAssertionError(String response) {
@@ -134,11 +135,11 @@ public class FATServletClient {
     /**
      * Runs a test in the servlet and returns the servlet output.
      *
-     * @param server      the started server containing the started application
-     * @param path        the url path (e.g. myApp/myServlet)
-     * @param queryString query string including at least the test name
-     *                        (e.g. testName or testname&key=value&key=value)
-     * @return output of the servlet
+     * @param  server      the started server containing the started application
+     * @param  path        the url path (e.g. myApp/myServlet)
+     * @param  queryString query string including at least the test name
+     *                         (e.g. testName or testname&key=value&key=value)
+     * @return             output of the servlet
      */
     public StringBuilder runTestWithResponse(LibertyServer server, String path, String queryString) throws Exception {
         URL url = new URL("http://" + server.getHostname() + ":" + server.getHttpDefaultPort() + getPathAndQuery(path, queryString));
@@ -195,9 +196,9 @@ public class FATServletClient {
     /**
      * Return the path and query for a servlet test method URL.
      *
-     * @param path     the servlet context and path (e.g., {@code "test"})
-     * @param testName the test name
-     * @return the path and query (e.g., {@code "/test?testMethod=test"})
+     * @param  path     the servlet context and path (e.g., {@code "test"})
+     * @param  testName the test name
+     * @return          the path and query (e.g., {@code "/test?testMethod=test"})
      */
     public static String getPathAndQuery(String path, String testName) {
         if (!path.contains("?")) {

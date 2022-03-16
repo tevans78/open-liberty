@@ -17,11 +17,12 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Properties;
 
-import com.ibm.websphere.simplicity.Bootstrap;
 import com.ibm.websphere.simplicity.ConnectionInfo;
 import com.ibm.websphere.simplicity.Machine;
 import com.ibm.websphere.simplicity.ProgramOutput;
 import com.ibm.websphere.simplicity.log.Log;
+
+import componenttest.common.apiservices.Bootstrap;
 
 /**
  *
@@ -35,7 +36,7 @@ public class LibertyServerUtils {
      * Windows uses \ for a path seperator and Java uses /
      *
      * @param s
-     *              the string to change
+     *            the string to change
      */
     public static String makeJavaCompatible(String s) {
         try {
@@ -54,7 +55,7 @@ public class LibertyServerUtils {
      * Windows uses \ for a path seperator and Java uses /
      *
      * @param s
-     *              the string to change
+     *            the string to change
      */
     public static String makeJavaCompatible(String s, Machine machine) {
         try {
@@ -94,7 +95,8 @@ public class LibertyServerUtils {
         String ret = "";
         SocketChannel channel = null;
         try {
-            channel = SocketChannel.open(new InetSocketAddress(machine.getHostname(), osgiPort));
+            channel = SocketChannel.open(new InetSocketAddress(machine
+                            .getHostname(), osgiPort));
 
             channel.configureBlocking(false);
 
@@ -131,11 +133,11 @@ public class LibertyServerUtils {
      * period. It will return what is read in the return value.
      *
      * @param channel
-     *                    the socket channel to read from.
+     *            the socket channel to read from.
      * @param prompt
-     *                    the prompt to look for.
+     *            the prompt to look for.
      * @param timeout
-     *                    how long to read for.
+     *            how long to read for.
      * @return what was read.
      * @throws IOException
      */
@@ -163,9 +165,9 @@ public class LibertyServerUtils {
      * We want to send a command to the OSGi console.
      *
      * @param channel
-     *                    the channel to write to.
+     *            the channel to write to.
      * @param command
-     *                    the command to send
+     *            the command to send
      * @throws IOException
      */
     private static void writeCommandTo(SocketChannel channel, String command) throws IOException {

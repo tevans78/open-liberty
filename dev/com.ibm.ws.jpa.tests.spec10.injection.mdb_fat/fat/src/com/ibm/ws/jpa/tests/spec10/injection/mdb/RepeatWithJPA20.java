@@ -13,7 +13,7 @@ package com.ibm.ws.jpa.tests.spec10.injection.mdb;
 
 import java.io.File;
 
-import com.ibm.websphere.simplicity.Bootstrap;
+import componenttest.common.apiservices.Bootstrap;
 import componenttest.rules.repeater.RepeatTestAction;
 
 /**

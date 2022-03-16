@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.ibm.websphere.simplicity;
+package componenttest.common.apiservices;
 
 /**
  * This enum contains the valid properties and property keys for the bootstrapping properties file.

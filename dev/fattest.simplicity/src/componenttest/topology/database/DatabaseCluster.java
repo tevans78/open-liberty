@@ -10,7 +10,7 @@
  *******************************************************************************/
 package componenttest.topology.database;
 
-import static com.ibm.websphere.simplicity.BootstrapProperty.DB_VENDORNAME;
+import static componenttest.common.apiservices.BootstrapProperty.DB_VENDORNAME;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,10 +23,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import com.ibm.websphere.simplicity.Bootstrap;
-import com.ibm.websphere.simplicity.BootstrapProperty;
 import com.ibm.websphere.simplicity.log.Log;
 
+import componenttest.common.apiservices.Bootstrap;
+import componenttest.common.apiservices.BootstrapProperty;
+import componenttest.exception.UnavailableDatabaseException;
 import componenttest.topology.impl.LibertyServer;
 
 /**
@@ -103,9 +104,9 @@ public class DatabaseCluster {
     }
 
     /**
-     * @param bootstrap      The instance of a bootstrapping.properties file to use
+     * @param bootstrap The instance of a bootstrapping.properties file to use
      * @param testBucketPath The location of the test bucket using this cluster
-     * @param dbPropsArr     A varargs array of java.util.Properties with database info
+     * @param dbPropsArr A varargs array of java.util.Properties with database info
      */
     public DatabaseCluster(Bootstrap bootstrap, String testBucketPath, Properties... dbPropsArr) throws Exception {
         this.b = bootstrap;
