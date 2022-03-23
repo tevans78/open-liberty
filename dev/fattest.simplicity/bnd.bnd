@@ -52,17 +52,7 @@ Private-Package: \
 	componenttest.annotation.processor,\
 	componenttest.depchain,\
 	componenttest.topology.impl.probe,\
-	com.ibm.websphere.simplicity.cluster.*,\
-	com.ibm.websphere.simplicity.commands.*,\
-	com.ibm.websphere.simplicity.configuration.*,\
-	com.ibm.websphere.simplicity.exception.*,\
-	com.ibm.websphere.simplicity.jobmanager.*,\
-	com.ibm.websphere.simplicity.product.*,\
-	com.ibm.websphere.simplicity.provider.*,\
-	com.ibm.websphere.simplicity.runtime.*,\
-	com.ibm.websphere.simplicity.server.*,\
-	com.ibm.websphere.simplicity.util.*,\
-	com.ibm.websphere.simplicity.wsadmin.*
+	com.ibm.websphere.simplicity.configuration
 
 Include-Resource: \
     resources/init-sqlserver.sql=resources/init-sqlserver.sql, \

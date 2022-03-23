@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 IBM Corporation and others.
+ * Copyright (c) 2011, 2022 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,8 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
-import com.ibm.websphere.simplicity.BootStrappingProperty;
 
 /**
  * This class extends the <code>java.util.Properties</code> Object overwriting the store method to
@@ -80,7 +78,7 @@ public class FormattedProperties extends Properties implements Comparator<String
         for (Object prop : props) {
             property = (String) prop;
             if (getProperty(property) != null) {
-                if (property.indexOf(BootStrappingProperty.DATA.toString()) == -1) {
+                if (property.indexOf("data") == -1) {
                     userProps.put(property, getProperty(property));
                 } else {
                     generatedProps.put(property, getProperty(property));
