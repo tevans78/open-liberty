@@ -74,9 +74,6 @@ test.project: true
 	org.eclipse.transformer:org.eclipse.transformer;version=0.3.0.20211005,\
 	com.ibm.ws.common.encoder;version=latest,\
 	com.ibm.ws.componenttest;version=latest,\
-	com.ibm.ws.componenttest:com.ibm.componenttest.common;version=1.0.0,\
-	com.ibm.ws.componenttest:com.ibm.ws.topology.helper;version=1.0.0,\
-	com.ibm.ws.componenttest:fat.util;version=1.0.0,\
 	com.ibm.ws.timedexit.internal;version=latest,\
 	com.sun.xml.bind:jaxb-core;version=2.2.10,\
 	com.sun.xml.bind:jaxb-impl;version=2.2.10,\
