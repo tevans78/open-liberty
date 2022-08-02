@@ -7,12 +7,12 @@ IBM-API-Package: \
   org.eclipse.microprofile.jwt; type="stable", \
   org.eclipse.microprofile.auth; type="stable"
 Subsystem-Name: MicroProfile JSON Web Token 2.1
--features=com.ibm.websphere.appserver.jwt-1.0, \
+-features=io.openliberty.jwt.internal-1.0, \
   io.openliberty.appSecurity-5.0; ibm.tolerates:="4.0", \
   io.openliberty.jsonp-2.1; ibm.tolerates:="2.0", \
   com.ibm.websphere.appserver.httpcommons-1.0, \
   io.openliberty.mpConfig-3.0, \
-  com.ibm.websphere.appserver.servlet-6.0; ibm.tolerates:="5.0", \
+  io.openliberty.servlet.internal-6.0; ibm.tolerates:="5.0", \
   io.openliberty.org.eclipse.microprofile.jwt-2.1, \
   io.openliberty.mpCompatible-6.0, \
   io.openliberty.cdi-4.0; ibm.tolerates:="3.0", \

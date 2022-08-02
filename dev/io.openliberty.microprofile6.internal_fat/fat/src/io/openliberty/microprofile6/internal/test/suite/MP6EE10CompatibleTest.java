@@ -21,33 +21,36 @@ import componenttest.custom.junit.runner.Mode.TestMode;
 import componenttest.topology.impl.LibertyServer;
 
 @RunWith(FATRunner.class)
-@Mode(TestMode.LITE)
-public class MP6CompatibleTest extends MPCompatibilityTestUtils {
+@Mode(TestMode.FULL)
+public class MP6EE10CompatibleTest extends MPCompatibilityTestUtils {
 
-    private static final String MP6_SERVER_NAME = "MP6CompatibleServer";
+    private static final String SERVER_NAME = "MP6andEE10";
 
-    @Server(MP6_SERVER_NAME)
-    public static LibertyServer mp6Server;
+    @Server(SERVER_NAME)
+    public static LibertyServer server;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        setUp(mp6Server);
+        setUp(server);
     }
 
     /**
-     * Just microProfile-6.0 ... Should always pass, a test
+     * microProfile-6.0 plus jakartaee-10.0
+     * At the moment, not all of the MP 6.0 features work with EE10 ... but they should before GA
+     * The server.xml has been modified to only include those features which currently work
      *
      * @throws Exception
      */
     @Test
-    @Mode(TestMode.LITE)
-    public void testMicroProfile60() throws Exception {
+    @Mode(TestMode.FULL)
+    public void testMP60andEE10() throws Exception {
         try {
-            mp6Server.setServerConfigurationFromFilePath("MP60.xml");
-            mp6Server.startServer();
-            runGetMethod(mp6Server, 200, "/helloworld/helloworld", MESSAGE);
+            server.setServerConfigurationFromFilePath("MP60andEE10.xml");
+            server.startServer();
+            runGetMethod(server, 200, "/helloworld/helloworld", MESSAGE);
         } finally {
-            mp6Server.stopServer("CWMOT0010W"); //CWMOT0010W: OpenTracing cannot track JAX-RS requests because an OpentracingTracerFactory class was not provided or client libraries for tracing backend are not in the class path.
+            server.stopServer("CWMOT0010W"); //CWMOT0010W: OpenTracing cannot track JAX-RS requests because an OpentracingTracerFactory class was not provided or client libraries for tracing backend are not in the class path.
         }
     }
+
 }
