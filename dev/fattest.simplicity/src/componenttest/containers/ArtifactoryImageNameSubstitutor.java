@@ -19,6 +19,8 @@ import org.testcontainers.utility.ImageNameSubstitutor;
 
 import com.ibm.websphere.simplicity.log.Log;
 
+import componenttest.common.ArtifactoryUtils;
+
 /**
  * An image name substituter is configured in testcontainers.properties and will transform docker image names.
  * Here we use it to apply a private registry prefix and organization prefix so that in remote builds we use an internal
@@ -28,11 +30,6 @@ import com.ibm.websphere.simplicity.log.Log;
 public class ArtifactoryImageNameSubstitutor extends ImageNameSubstitutor {
 
     private static final Class<?> c = ArtifactoryImageNameSubstitutor.class;
-
-    /**
-     * Manual override that will allow builds or users to pull from Artifactory instead of DockerHub.
-     */
-    private static final String substitutionOverride = "fat.test.use.artifactory.substitution";
 
     /**
      * Artifactory keeps a cache of docker images from DockerHub within
@@ -67,7 +64,7 @@ public class ArtifactoryImageNameSubstitutor extends ImageNameSubstitutor {
             // No need to check for this in Open Liberty since all images need to be accessible outside of Artifactory.
 
             // Priority 4: System property use.artifactory.substitution (NOTE: only honor this property if set to true)
-            if (Boolean.getBoolean(substitutionOverride)) {
+            if (ArtifactoryUtils.dockerSubstitutionOverride()) {
                 result = DockerImageName.parse(mirror + '/' + original.asCanonicalNameString())
                                 .withRegistry(ArtifactoryRegistry.instance().getRegistry())
                                 .asCompatibleSubstituteFor(original);

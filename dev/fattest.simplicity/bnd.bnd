@@ -35,6 +35,7 @@ Export-Package: \
         com.ibm.ws.fat.util.jmx.mbeans;version=2.0,\
         com.ibm.ws.fat.util.tck;version=2.0,\
         componenttest.annotation;version=2.0,\
+        componenttest.common;version=2.0,\
         componenttest.common.apiservices;version=2.0,\
         componenttest.common.apiservices.cmdline;version=2.0,\
         componenttest.containers;version=2.0,\

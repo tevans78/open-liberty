@@ -52,6 +52,7 @@ import java.util.regex.Pattern;
 
 import com.ibm.websphere.simplicity.log.Log;
 
+import componenttest.common.ArtifactoryUtils;
 import componenttest.topology.utils.tck.TCKResultsInfo.TCKJarInfo;
 import componenttest.topology.utils.tck.TCKResultsInfo.Type;
 import junit.framework.AssertionFailedError;
@@ -60,11 +61,6 @@ public class TCKUtilities {
 
     private static final Class<TCKUtilities> c = TCKUtilities.class;
 
-    static final String FAT_TEST_PREFIX = "fat.test.";
-    static final String ARTIFACTORY_FORCE_EXTERNAL_KEY = "artifactory.force.external.repo";
-    static final String ARTIFACTORY_SERVER_KEY = "artifactory.download.server";
-    static final String ARTIFACTORY_USER_KEY = "artifactory.download.user";
-    static final String ARTIFACTORY_TOKEN_KEY = "artifactory.download.token";
     static final String MVN_DISTRIBUTION_URL_KEY = "distributionUrl";
     static final String MVN_DISTRIBUTION_SHA_KEY = "distributionSha256Sum";
     static final String MVN_WRAPPER_URL_KEY = "wrapperUrl";
@@ -595,8 +591,8 @@ public class TCKUtilities {
 
     public static class ArtifactoryAuthenticator extends Authenticator {
         PasswordAuthentication authentication;
-        String userName = getArtifactoryUser();
-        String password = getArtifactoryToken();
+        String userName = ArtifactoryUtils.getArtifactoryUser();
+        String password = ArtifactoryUtils.getArtifactoryToken();
 
         ArtifactoryAuthenticator() {
             if (userName == null || password == null) {
@@ -657,93 +653,6 @@ public class TCKUtilities {
             props.store(fos, "MVN Wrapper Properties");
         }
         return props;
-    }
-
-    /**
-     * Checks whether we are configured to use artifactory or not
-     *
-     * @return {@code true} if we are configured to use artifactory, {@code false} if not
-     */
-    static boolean useArtifactory() {
-        boolean forceExternal = isArtifactoryForceExternal();
-        String artifactoryServer = getArtifactoryServer();
-
-        boolean useArtifactory = Objects.nonNull(artifactoryServer) && !forceExternal;
-
-        Log.info(c, "useArtifactory", "Use artifactory = " + useArtifactory + " ("
-                                      + ARTIFACTORY_SERVER_KEY + "=" + artifactoryServer + ", "
-                                      + ARTIFACTORY_FORCE_EXTERNAL_KEY + "=" + forceExternal
-                                      + ")");
-        return useArtifactory;
-    }
-
-    /**
-     * Get the flag for forcing artfiactory usage
-     *
-     * @return true if flag was true, false otherwise
-     */
-    static boolean isArtifactoryForceExternal() {
-        return Boolean.parseBoolean(getArtifactoryForceExternal());
-    }
-
-    /**
-     * Get the flag for forcing artfiactory usage
-     *
-     * @return true if flag was true, false otherwise
-     */
-    static String getArtifactoryForceExternal() {
-        return normalizeStringProperty(System.getProperty(FAT_TEST_PREFIX + ARTIFACTORY_FORCE_EXTERNAL_KEY));
-    }
-
-    /**
-     * Get the artifactory server to use
-     *
-     * @return the artifactory server or {@code null} if none is configured
-     */
-    static String getArtifactoryServer() {
-        return normalizeStringProperty(System.getProperty(FAT_TEST_PREFIX + ARTIFACTORY_SERVER_KEY));
-    }
-
-    /**
-     * Get the username to access artifactory
-     *
-     * @return the username, or {@code null} if none is configured
-     */
-    static String getArtifactoryUser() {
-        return normalizeStringProperty(System.getProperty(FAT_TEST_PREFIX + ARTIFACTORY_USER_KEY));
-    }
-
-    /**
-     * Get the token to use to access artifactory
-     *
-     * @return the token, or {@code null} if none is configured
-     */
-    static String getArtifactoryToken() {
-        return normalizeStringProperty(System.getProperty(FAT_TEST_PREFIX + ARTIFACTORY_TOKEN_KEY));
-    }
-
-    /**
-     * This validates the result string from using System.getProperty().
-     * See launch.xml line 322 we first check if a property was set via a command line property
-     * If not we assume the property was set as an environment property.
-     *
-     * Which mean fat.test.artifactory.download.server could equal "${env.artifactory.download.server}"
-     *
-     * @param  result the string to validate
-     * @return        null if the string was invalid, itself otherwise.
-     */
-    static String normalizeStringProperty(String result) {
-        if (result == null)
-            return result;
-
-        if (result.isEmpty()) {
-            return null;
-        }
-
-        if (result.startsWith("${"))
-            return null;
-
-        return result;
     }
 
     /**
