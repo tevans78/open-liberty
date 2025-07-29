@@ -13,6 +13,7 @@
 package com.ibm.wsspi.http.ee7;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
@@ -26,6 +27,8 @@ import com.ibm.wsspi.channelfw.VirtualConnection;
 import com.ibm.wsspi.http.channel.exception.BodyCompleteException;
 import com.ibm.wsspi.http.channel.inbound.HttpInboundServiceContext;
 
+import io.netty.handler.codec.http.FullHttpRequest;
+
 /**
  *
  */
@@ -38,6 +41,10 @@ public class HttpInputStreamEE7 extends HttpInputStreamImpl {
 
     public HttpInputStreamEE7(HttpInboundServiceContext context) {
         super(context);
+    }
+
+    public HttpInputStreamEE7(HttpInboundServiceContext context, FullHttpRequest request) {
+        super(context, request);
     }
 
     /*
@@ -118,7 +125,8 @@ public class HttpInputStreamEE7 extends HttpInputStreamImpl {
                     Tr.debug(tc, "There is no data currently available in the buffer");
                 }
 
-                if ((GrpcServletServices.grpcInUse) && (isc != null) && (isc instanceof HttpInboundServiceContextImpl)) {
+                if ((GrpcServletServices.grpcInUse) && (isc != null) && (isc instanceof HttpInboundServiceContextImpl)
+                    && Objects.isNull(((HttpInboundServiceContextImpl) isc).getNettyContext())) {
                     int eos = ((HttpInboundServiceContextImpl) isc).getGRPCEndStream();
                     if (eos == 1) {
                         if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
